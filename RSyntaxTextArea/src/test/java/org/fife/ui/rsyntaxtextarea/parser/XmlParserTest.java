@@ -1,6 +1,4 @@
 /*
- * 10/03/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -91,7 +89,7 @@ class XmlParserTest {
 		Assertions.assertEquals(1, res.getLastLineParsed());
 		List<ParserNotice> notices = res.getNotices();
 		Assertions.assertEquals(1, notices.size());
-		ParserNotice notice = notices.get(0);
+		ParserNotice notice = notices.getFirst();
 		Assertions.assertEquals(ParserNotice.Level.ERROR, notice.getLevel());
 
 	}
@@ -115,7 +113,7 @@ class XmlParserTest {
 		Assertions.assertEquals(2, res.getLastLineParsed());
 		List<ParserNotice> notices = res.getNotices();
 		Assertions.assertEquals(1, notices.size());
-		ParserNotice notice = notices.get(0);
+		ParserNotice notice = notices.getFirst();
 		Assertions.assertEquals(ParserNotice.Level.ERROR, notice.getLevel());
 
 	}

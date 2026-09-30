@@ -1,9 +1,4 @@
 /*
- * 08/06/2004
- *
- * WrappedSyntaxView.java - Test implementation of WrappedSyntaxView that
- * is also aware of RSyntaxTextArea's different fonts per token type.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -18,6 +13,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
@@ -36,8 +33,7 @@ import org.fife.ui.rsyntaxtextarea.TokenUtils.TokenSubList;
 import org.fife.ui.rsyntaxtextarea.folding.Fold;
 import org.fife.ui.rsyntaxtextarea.folding.FoldManager;
 import org.fife.ui.rtextarea.Gutter;
-
-import static org.fife.ui.rsyntaxtextarea.SyntaxView.EOL_MARKER;
+import org.fife.util.SwingUtils;
 
 
 /**
@@ -50,7 +46,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 												RSTAView {
 
     private int tabBase;
-    private int tabSize;
+    private float tabSize;
 
 	/**
 	 * This is reused to keep from allocating/deallocating.
@@ -237,7 +233,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 		// If this line is an empty line, then the token list is simply a
 		// null token.  In this case, the line highlight will be skipped in
 		// the loop below, so unfortunately we must manually do it here.
-		if (token!=null && token.getType()==Token.NULL) {
+		if (token!=null && token.getType()==TokenTypes.NULL) {
 			h.paintLayeredHighlights(g, p0,p1, r, host, this);
 			return;
 		}
@@ -322,7 +318,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 		// If this line is an empty line, then the token list is simply a
 		// null token.  In this case, the line highlight will be skipped in
 		// the loop below, so unfortunately we must manually do it here.
-		if (token!=null && token.getType()==Token.NULL) {
+		if (token!=null && token.getType()==TokenTypes.NULL) {
 			h.paintLayeredHighlights(g, p0,p1, r, host, this);
 			return;
 		}
@@ -489,7 +485,10 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 	 * @return The width of the EOL marker.
 	 */
 	private float getEOLMarkerWidth(RSyntaxTextArea textArea) {
-		return metrics.stringWidth(EOL_MARKER);
+		if (textArea == null) {
+			textArea = (RSyntaxTextArea)getContainer();
+		}
+		return metrics.stringWidth(textArea.getEOLMarker());
 	}
 
 
@@ -820,8 +819,8 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 		if (tabSize == 0) {
 			return x;
 		}
-		int ntabs = ((int) x - tabBase) / tabSize;
-		return tabBase + ((ntabs + 1f) * tabSize);
+		int ntabs = (int) ((x - tabBase) / tabSize);
+		return tabBase + ((ntabs + 1) * tabSize);
 	}
 
 
@@ -1038,7 +1037,9 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 		Component host = getContainer();
 		Font f = host.getFont();
 		metrics = host.getFontMetrics(f); // Metrics for the default font.
-		tabSize = getTabSize() * metrics.charWidth('m');
+		FontRenderContext frc = metrics.getFontRenderContext();
+		float tabWidth = (float) f.getStringBounds("m", frc).getWidth();
+		tabSize = getTabSize() * tabWidth;
 	}
 
 
@@ -1228,10 +1229,10 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 										throws BadLocationException {
 
 			//System.err.println("--- begin modelToView ---");
-			Rectangle alloc = a.getBounds();
+			Rectangle2D alloc = a.getBounds2D();
 			RSyntaxTextArea textArea = (RSyntaxTextArea)getContainer();
-			alloc.height = textArea.getLineHeight();//metrics.getHeight();
-			alloc.width = 1;
+			SwingUtils.setHeight(alloc, textArea.getLineHeight());//metrics.getHeight();
+			SwingUtils.setWidth(alloc, 1.0f);
 			int p0 = getStartOffset();
 			int p1 = getEndOffset();
 			int testP = (b == Position.Bias.Forward) ? pos :
@@ -1244,7 +1245,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 			Element map = doc.getDefaultRootElement();
 			int line = map.getElementIndex(p0);
 			Token tokenList = doc.getTokenListForLine(line);
-			float x0 = alloc.x;//0;
+			float x0 = (float) alloc.getX();//0;
 
 			while (p0 < p1) {
 				TokenSubList subList = TokenUtils.getSubTokenList(tokenList, p0,
@@ -1257,7 +1258,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 					alloc = RSyntaxUtilities.getLineWidthUpTo(
 									textArea, s, p0, pos,
 									WrappedSyntaxView.this,
-									alloc, alloc.x);
+									alloc, (float) alloc.getX());
 					//System.err.println("--- end modelToView ---");
 					return alloc;
 				}
@@ -1268,7 +1269,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 						alloc = RSyntaxUtilities.getLineWidthUpTo(
 									textArea, s, p0, pos,
 									WrappedSyntaxView.this,
-									alloc, alloc.x);
+									alloc, (float) alloc.getX());
 					}
 					//System.err.println("--- end modelToView ---");
 					return alloc;
@@ -1276,7 +1277,7 @@ public class WrappedSyntaxView extends BoxView implements TabExpander,
 
 				p0 = (p == p0) ? p1 : p;
 				//System.err.println("... ... Incrementing y");
-				alloc.y += alloc.height;
+				SwingUtils.setY(alloc, alloc.getY() + alloc.getHeight());
 
 			}
 

@@ -1,8 +1,4 @@
 /*
- * 10/13/2013
- *
- * RTextAreaHighlighter.java - Highlighter for RTextAreas.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -24,8 +20,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.LayeredHighlighter;
 import javax.swing.text.Position;
 import javax.swing.text.View;
-
-import org.fife.ui.rsyntaxtextarea.DocumentRange;
 
 
 /**

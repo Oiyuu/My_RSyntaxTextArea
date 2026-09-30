@@ -1,6 +1,4 @@
 /*
- * 06/06/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -560,5 +558,11 @@ class SASTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			"\t\t",
 			"\t  "
 		);
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("()", createTokenMaker().getBracketPairs());
 	}
 }

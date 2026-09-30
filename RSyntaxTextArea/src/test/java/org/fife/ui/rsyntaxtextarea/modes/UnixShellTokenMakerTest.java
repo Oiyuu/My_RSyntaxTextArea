@@ -1,6 +1,4 @@
 /*
- * 03/16/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -1643,6 +1641,12 @@ class UnixShellTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			super.addToken(array, start, end, tokenType, startOffset, hyperlink);
 		}
 
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}()[]", createTokenMaker().getBracketPairs());
 	}
 
 

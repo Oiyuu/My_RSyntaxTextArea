@@ -1,8 +1,4 @@
 /*
- * 12/23/2012
- *
- * JsonFoldParser.java - Fold parser for JSON.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -124,7 +120,7 @@ public class JsonFoldParser implements FoldParser {
 	 * @see #isRightBracket(Token)
 	 */
 	private static boolean isLeftBracket(Token t) {
-		return t.getType()==TokenTypes.SEPARATOR && t.isSingleChar('[');
+		return t.isSingleChar(TokenTypes.SEPARATOR, '[');
 	}
 
 
@@ -136,7 +132,7 @@ public class JsonFoldParser implements FoldParser {
 	 * @see #isLeftBracket(Token)
 	 */
 	private static boolean isRightBracket(Token t) {
-		return t.getType()==TokenTypes.SEPARATOR && t.isSingleChar(']');
+		return t.isSingleChar(TokenTypes.SEPARATOR, ']');
 	}
 
 

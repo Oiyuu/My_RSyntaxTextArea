@@ -1,12 +1,10 @@
 /*
- * 04/25/2007
- *
- * RTextAreaUI.java - UI used by instances of RTextArea.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rtextarea;
+
+import org.fife.util.SwingUtils;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -589,7 +587,7 @@ public class RTextAreaUI extends BasicTextAreaUI {
 	 *         into the document.
 	 */
 	public int yForLineContaining(int offs) throws BadLocationException {
-		Rectangle r = modelToView(textArea, offs);
+		Rectangle r = SwingUtils.getBounds(textArea, offs);
 		return r!=null ? r.y : -1;
 	}
 

@@ -1,9 +1,4 @@
 /*
- * 02/17/2009
- *
- * Gutter.java - Manages line numbers, icons, etc. on the left-hand side of
- * an RTextArea.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -519,7 +514,7 @@ public class Gutter extends JPanel {
 	 */
 	public GutterIconInfo[] getTrackingIcons(Point p)
 			throws BadLocationException {
-		int offs = textArea.viewToModel(new Point(0, p.y));
+		int offs = textArea.viewToModel2D(new Point(0, p.y));
 		int line = textArea.getLineOfOffset(offs);
 		return iconArea.getTrackingIcons(line);
 	}

@@ -1,6 +1,4 @@
 /*
- * 12/29/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -170,6 +168,12 @@ class YamlTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			"'Hello world unterminated",
 			"'Invalid escape \\uINVALID'"
 		);
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}[]", createTokenMaker().getBracketPairs());
 	}
 
 

@@ -1,6 +1,4 @@
 /*
- * 07/09/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -87,6 +85,12 @@ class PropertiesFileTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		Assertions.assertFalse(token.isHyperlink());
 		Assertions.assertTrue(token.is(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, "Options"));
 
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("", createTokenMaker().getBracketPairs());
 	}
 
 

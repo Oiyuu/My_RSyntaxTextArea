@@ -1,17 +1,15 @@
 /*
- * 02/21/2004
- *
- * Token.java - A token used in syntax highlighting.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rsyntaxtextarea;
 
+import org.fife.util.SwingUtils;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.text.Segment;
 import javax.swing.text.TabExpander;
@@ -226,11 +224,7 @@ public class TokenImpl implements Token {
 					sb.append(text, lastI, i-lastI);
 					lastI = i+1;
 					if (tabsToSpaces && tabStr==null) {
-                        StringBuilder stringBuilder = new StringBuilder();
-						for (int j=0; j<textArea.getTabSize(); j++) {
-                            stringBuilder.append("&nbsp;");
-						}
-                        tabStr = stringBuilder.toString();
+						tabStr = "&nbsp;".repeat(Math.max(0, textArea.getTabSize()));
 					}
 					sb.append(tabsToSpaces ? tabStr : "&#09;");
 					lastWasSpace = false;
@@ -461,7 +455,7 @@ public class TokenImpl implements Token {
 					start = i + 1; // Do charsWidth() from next char.
 				}
 				else {
-					nextX = stableX + fm.charsWidth(text, start, i - start + 1);
+					nextX = stableX + SwingUtils.charsWidth(fm, text, start, i - start + 1);
 				}
 				if (x >= currX && x < nextX) {
 					if ((x - currX) < (nextX - x)) {
@@ -509,7 +503,7 @@ public class TokenImpl implements Token {
 				x = e.nextTabStop(x, 0);
 			}
 			else {
-				x += fm.charWidth(text[i]);
+				x += SwingUtils.charWidth(fm, text[i]);
 			}
 			if (x>endBeforeX) {
 				// If not even the first character fits into the space, go
@@ -568,7 +562,7 @@ public class TokenImpl implements Token {
 					// for here, so we check before calling.
 					w = i - currentStart;
 					if (w > 0) {
-						width += fm.charsWidth(text, currentStart, w);
+						width += SwingUtils.charsWidth(fm, text, currentStart, w);
 					}
 					currentStart = i + 1;
 					width = e.nextTabStop(width, 0);
@@ -578,7 +572,7 @@ public class TokenImpl implements Token {
 			// point to get the widths for, so we don't check for w>0 (mini-
 			// optimization).
 			w = endBefore - currentStart;
-			width += fm.charsWidth(text, currentStart, w);
+			width += SwingUtils.charsWidth(fm, text, currentStart, w);
 		}
 		return width - x0;
 	}
@@ -665,7 +659,7 @@ public class TokenImpl implements Token {
 
 	@Override
 	public boolean isPaintable() {
-		return getType()>Token.NULL;
+		return getType()>TokenTypes.NULL;
 	}
 
 
@@ -694,10 +688,10 @@ public class TokenImpl implements Token {
 
 
 	@Override
-	public Rectangle listOffsetToView(RSyntaxTextArea textArea, TabExpander e,
-			int pos, int x0, Rectangle rect) {
+	public Rectangle2D listOffsetToView(RSyntaxTextArea textArea, TabExpander e,
+			int pos, float x0, Rectangle2D rect) {
 
-		int stableX = x0; // Cached ending x-coord. of last tab or token.
+		float stableX = x0; // Cached ending x-coord. of last tab or token.
 		TokenImpl token = this;
 		FontMetrics fm;
 		Segment s = new Segment();
@@ -723,16 +717,16 @@ public class TokenImpl implements Token {
 				// Must use this (actually fm.charWidth()), and not
 				// fm.charsWidth() for returned value to match up with where
 				// text is actually painted on OS X!
-				int w = Utilities.getTabbedTextWidth(s, fm, stableX, e,
-						token.getOffset());
-				rect.x = stableX + w;
+				float w = Utilities.getTabbedTextWidth(s, fm, stableX, e,
+					token.getOffset());
+				SwingUtils.setX(rect, stableX + w);
 				end = token.documentToToken(pos);
 
 				if (text[end] == '\t') {
-					rect.width = fm.charWidth(' ');
+					SwingUtils.setWidth(rect, SwingUtils.charWidth(fm, ' '));
 				}
 				else {
-					rect.width = fm.charWidth(text[end]);
+					SwingUtils.setWidth(rect, SwingUtils.charWidth(fm, text[end]));
 				}
 
 				return rect;
@@ -757,8 +751,8 @@ public class TokenImpl implements Token {
 		// a width of 1 (so selection highlights don't extend way past line's
 		// text). A ConfigurableCaret will know to paint itself with a larger
 		// width.
-		rect.x = stableX;
-		rect.width = 1;
+		SwingUtils.setX(rect, stableX);
+		SwingUtils.setWidth(rect, 1);
 		return rect;
 
 	}
@@ -925,7 +919,7 @@ public class TokenImpl implements Token {
 	@Override
 	public String toString() {
 		return "[Token: " +
-			(getType()==Token.NULL ? "<null token>" :
+			(getType()==TokenTypes.NULL ? "<null token>" :
 				"text: '" +
 					(text==null ? "<null>" : getLexeme() + "'; " +
 	       		"offset: " + getOffset() + "; type: " + getType() + "; " +

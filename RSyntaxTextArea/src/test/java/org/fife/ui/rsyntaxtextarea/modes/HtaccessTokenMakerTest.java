@@ -1,6 +1,4 @@
 /*
- * 06/05/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -344,5 +342,11 @@ class HtaccessTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			"  \t ",
 			"\t\t"
 		);
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("", createTokenMaker().getBracketPairs());
 	}
 }

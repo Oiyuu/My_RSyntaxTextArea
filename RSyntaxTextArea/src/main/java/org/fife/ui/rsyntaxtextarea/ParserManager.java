@@ -1,9 +1,4 @@
 /*
- * 09/26/2005
- *
- * ParserManager.java - Manages the parsing of an RSyntaxTextArea's document,
- * if necessary.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -39,6 +34,7 @@ import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ToolTipInfo;
 import org.fife.ui.rtextarea.RDocument;
 import org.fife.ui.rtextarea.RTextAreaHighlighter.HighlightInfo;
+import org.fife.util.SwingUtils;
 
 
 /**
@@ -377,7 +373,7 @@ class ParserManager implements DocumentListener, ActionListener,
 		if (noticeHighlightPairs!=null) {
 
 			Point p = e.getPoint();
-			int pos = textArea.viewToModel(p);
+			int pos = textArea.viewToModel2D(p);
 
 			for (NoticeHighlightPair pair : noticeHighlightPairs) {
 				ParserNotice notice = pair.notice;
@@ -511,8 +507,8 @@ class ParserManager implements DocumentListener, ActionListener,
 				end = elem.getEndOffset() - 1;
 			}
 
-			Rectangle r1 = textArea.modelToView(start);
-			Rectangle r2 = textArea.modelToView(end);
+			Rectangle r1 = SwingUtils.getBounds(textArea, start);
+			Rectangle r2 = SwingUtils.getBounds(textArea, end);
 			if (r1.y!=r2.y) {
 				// If the notice spans multiple lines, give them the benefit
 				// of the doubt.  This is only "wrong" if the user is in empty

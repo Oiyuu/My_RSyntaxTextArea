@@ -23,11 +23,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.fife.ui.rsyntaxtextarea.*;
-import org.fife.ui.rtextarea.FoldIndicatorStyle;
-import org.fife.ui.rtextarea.Gutter;
-import org.fife.ui.rtextarea.RTextScrollPane;
-import org.fife.ui.rtextarea.LineNumberFormatter;
-import org.fife.ui.rtextarea.LineNumberList;
+import org.fife.ui.rtextarea.*;
 
 
 /**
@@ -44,12 +40,13 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 
 	/**
-	 * 构造根面板：创建文本区、滚动面板、错误条与菜单栏。
+	 * 构造根面板：创建文本区、滚动面板、错误条、菜单栏与底部字体控制条。
 	 */
 	DemoRootPane() {
 		textArea = createTextArea();
 		setText("JavaExample.txt");
-		textArea.setSyntaxEditingStyle(SYNTAX_STYLE_D);
+		textArea.setSyntaxEditingStyle(SYNTAX_STYLE_JAVA);
+		textArea.setTabSize(4);
 		scrollPane = new RTextScrollPane(textArea, true);
 		Gutter gutter = scrollPane.getGutter();
 		gutter.setBookmarkingEnabled(true);
@@ -57,9 +54,10 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		gutter.setBookmarkIcon(new ImageIcon(url));
 		getContentPane().add(scrollPane);
 		ErrorStrip errorStrip = new ErrorStrip(textArea);
-		//errorStrip.setBackground(java.awt.Color.blue);
+		//errorStrip.setBackground(java.awt.Color.BLUE);
 		getContentPane().add(errorStrip, BorderLayout.LINE_END);
 		setJMenuBar(createMenuBar());
+		getContentPane().add(createFontControls(), BorderLayout.SOUTH);
 	}
 
 
@@ -147,6 +145,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		addSyntaxItem("Clojure",  "ClojureExample.txt", SYNTAX_STYLE_CLOJURE, bg, menu);
 		addSyntaxItem("CSS",  "CssExample.txt", SYNTAX_STYLE_CSS, bg, menu);
 		addSyntaxItem("Dockerfile", "DockerfileExample.txt", SYNTAX_STYLE_DOCKERFILE, bg, menu);
+		addSyntaxItem(".env", "EnvExample.txt", SYNTAX_STYLE_ENV, bg, menu);
 		addSyntaxItem("Go", "GoExample.txt", SYNTAX_STYLE_GO, bg, menu);
 		addSyntaxItem("Handlebars", "HandlebarsExample.txt", SYNTAX_STYLE_HANDLEBARS, bg, menu);
 		addSyntaxItem("Hosts", "HostsExample.txt", SYNTAX_STYLE_HOSTS, bg, menu);
@@ -168,11 +167,13 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		addSyntaxItem("Ruby", "RubyExample.txt", SYNTAX_STYLE_RUBY, bg, menu);
 		addSyntaxItem("Rust", "RustExample.txt", SYNTAX_STYLE_RUST, bg, menu);
 		addSyntaxItem("SQL",  "SQLExample.txt", SYNTAX_STYLE_SQL, bg, menu);
+		addSyntaxItem("纯文本",  "TextExample.txt", SYNTAX_STYLE_NONE, bg, menu);
+		addSyntaxItem("文本对齐",  "TextAlignmentExample.txt", SYNTAX_STYLE_NONE, bg, menu);
 		addSyntaxItem("TypeScript", "TypeScriptExample.txt", SYNTAX_STYLE_TYPESCRIPT, bg, menu);
 		addSyntaxItem("VHDL", "VhdlExample.txt", SYNTAX_STYLE_VHDL, bg, menu);
 		addSyntaxItem("XML",  "XMLExample.txt", SYNTAX_STYLE_XML, bg, menu);
 		addSyntaxItem("YAML", "YamlExample.txt", SYNTAX_STYLE_YAML, bg, menu);
-		menu.getItem(2).setSelected(true);
+		menu.getItem(13).setSelected(true); // Default to Java
 		mb.add(menu);
 
 		menu = new JMenu("视图");
@@ -221,6 +222,8 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		menu.add(cbItem);
 		cbItem = new JCheckBoxMenuItem(new TabLinesAction());
 		menu.add(cbItem);
+		cbItem = new JCheckBoxMenuItem(new WhitespaceVisibleAction());
+		menu.add(cbItem);
 		mb.add(menu);
 
 		menu = new JMenu("字体");
@@ -231,6 +234,10 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		cbItem.setSelected(false);
 		menu.add(cbItem);
 		cbItem = new JCheckBoxMenuItem(new ToggleKerningAction());
+		menu.add(cbItem);
+		cbItem = new JCheckBoxMenuItem(new TabLinesAction());
+		menu.add(cbItem);
+		cbItem = new JCheckBoxMenuItem(new WhitespaceVisibleAction());
 		menu.add(cbItem);
 		cbItem = new JCheckBoxMenuItem(new ToggleLigatureSupportAction());
 		menu.add(cbItem);
@@ -262,9 +269,72 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		mb.add(menu);
 
 		return mb;
-
 	}
 
+	/**
+	 * 创建底部的字体控制条（制表符宽度、等宽筛选、字体选择、字号）。
+	 *
+	 * @return 字体控制条面板。
+	 */
+	private Component createFontControls() {
+		JPanel panel = new JPanel();
+
+		JSpinner tabSize = new JSpinner();
+		tabSize.setModel(new SpinnerNumberModel(4, 1, 72, -1));
+		tabSize.addChangeListener(e -> textArea.setTabSize((Integer) tabSize.getValue()));
+
+		JSpinner fontSize = new JSpinner();
+		fontSize.setModel(new SpinnerNumberModel(12, 2, 72, -1));
+		fontSize.addChangeListener(e -> textArea.setFont(deriveFont(textArea.getFont(), fontSize)));
+
+		JCheckBox mono = new JCheckBox("等宽字体");
+		mono.setSelected(true);
+
+		JComboBox<Font> fontCombo = new JComboBox<>();
+		fontCombo.addItemListener(e -> textArea.setFont(deriveFont((Font) e.getItem(), fontSize)));
+		fontCombo.setRenderer((list, font, index, isSelected, cellHasFocus) -> new JLabel(font.getFontName()));
+		fillFontCombo(fontCombo, mono.isSelected());
+		mono.addItemListener(evt -> fillFontCombo(fontCombo, mono.isSelected()));
+
+		panel.add(new JLabel("制表符宽度："));
+		panel.add(tabSize);
+		panel.add(mono);
+		panel.add(fontCombo);
+		panel.add(fontSize);
+
+		return panel;
+	}
+
+	/**
+	 * 按指定字号派生出新字体。
+	 *
+	 * @param item 原始字体。
+	 * @param fontSize 字号选择器。
+	 * @return 派生后的字体。
+	 */
+	private Font deriveFont(Font item, JSpinner fontSize) {
+		return item.deriveFont(1.0f*(int) fontSize.getValue());
+	}
+
+	/**
+	 * 填充字体下拉框，可选择只列出等宽字体。
+	 *
+	 * @param fontCombo 字体下拉框。
+	 * @param onlyMonospaced 是否只显示等宽字体。
+	 */
+	private void fillFontCombo(JComboBox<Font> fontCombo, boolean onlyMonospaced) {
+		Font appFont = RSyntaxTextArea.getDefaultFont();
+		String[] fontFamilyNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+
+		fontCombo.removeAllItems();
+		for (String name : fontFamilyNames) {
+			Font font = FontUtil.createFont(name, Font.PLAIN, appFont.getSize());
+			if (!onlyMonospaced || RSyntaxUtilities.isMonospaced(getFontMetrics(font))) {
+				fontCombo.addItem(font);
+			}
+		}
+		fontCombo.setSelectedItem(appFont);
+	}
 
 	/**
 	 * 创建本应用使用的文本区。
@@ -281,6 +351,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 		textArea.setMarkOccurrences(true);
 		textArea.setCodeFoldingEnabled(true);
 		textArea.setClearWhitespaceLinesEnabled(false);
+		addPropertyChangeListener(evt -> textArea.onGraphicsChange());
 
 		InputMap im = textArea.getInputMap();
 		ActionMap am = textArea.getActionMap();
@@ -358,7 +429,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 			textArea.discardAllEdits();
 		} catch (RuntimeException re) {
 			throw re; // FindBugs
-		} catch (Exception e) { // Never happens
+		} catch (Exception e) { // 不会发生
 			textArea.setText("在此输入内容，即可看到语法高亮效果");
 		}
 	}
@@ -596,7 +667,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		ToggleAntiAliasingAction() {
 			putValue(NAME, "抗锯齿");
-			int defaultModifier = getToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK;
+			int defaultModifier = getToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK;
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, defaultModifier));
 		}
 
@@ -614,7 +685,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		ToggleFractionalFontMetricsAction() {
 			putValue(NAME, "小数字体度量");
-			int defaultModifier = getToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK;
+			int defaultModifier = getToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK;
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, defaultModifier));
 		}
 
@@ -632,7 +703,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		ToggleKerningAction() {
 			putValue(NAME, "字距调整");
-			int defaultModifier = getToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK;
+			int defaultModifier = getToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK;
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_1, defaultModifier));
 		}
 
@@ -655,7 +726,7 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		ToggleLigatureSupportAction() {
 			putValue(NAME, "连字支持");
-			int defaultModifier = getToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_DOWN_MASK;
+			int defaultModifier = getToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK;
 			putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_2, defaultModifier));
 		}
 
@@ -705,6 +776,24 @@ public class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 	}
 
+	/**
+	 * 切换是否显示空白字符。
+	 */
+	private class WhitespaceVisibleAction extends AbstractAction {
+
+		private boolean selected;
+
+		WhitespaceVisibleAction() {
+			putValue(NAME, "空白字符");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			selected = !selected;
+			textArea.setWhitespaceVisible(selected);
+		}
+
+	}
 	/**
 	 * 切换自动换行。
 	 */

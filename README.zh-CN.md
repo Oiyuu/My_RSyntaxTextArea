@@ -29,11 +29,17 @@ RSyntaxTextArea 使用 [Gradle](http://gradle.org/) 构建。若要编译源码�
 
     ./gradlew build --warning-mode all
 
-RSTA 3.0 及更高版本**编译需要 Java 17**，但可在 Java 8 上运行。
-如果需要兼容 Java 6，请使用 2.6.x 版本。
+RSTA 4.0 及更高版本**运行需要 JRE 11**。如需支持更老的 Java 版本，按下表选择：
 
-> 本仓库当前基线为 **3.6.3**，`gradle.properties` 中 `javaLanguageVersion=8`，
-> 后续会按 issue 流程升级到 4.0.1（见 issue #4）。
+| RSTA 版本 | 构建所需 JDK | 运行所需 JRE |
+|-----------|--------------|--------------|
+| 4.x       | 25           | 11           |
+| 3.x       | 17           | 8            |
+| 2.6.x     | 6            | 6            |
+
+> 本仓库当前基线为 **4.0.1**，`gradle.properties` 中 `javaLanguageVersion=11`
+> （编译产物的 release 目标）。注意上游要求 4.x 用 JDK 25 构建，
+> 若本机 JDK 版本较低，`./gradlew build` 可能失败，需先升级 JDK。
 
 ## 演示程序
 

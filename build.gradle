@@ -8,18 +8,18 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.spotbugs' version '6.5.5'
+    id 'com.github.spotbugs' version '6.5.9'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
 
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
-// We require building with JDK 17 or later. Built artifact compatibility
+// We require building with JDK 25 or later. Built artifact compatibility
 // is controlled by javaLanguageVersion
-assert JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)
+assert JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)
 
 group = 'com.fifesoft'
-// NOTE: Local Java 17: /Library/Java/JavaVirtualMachines/jdk-17.0.13+11/Contents/Home
+// NOTE: Local Java 25: /Library/Java/JavaVirtualMachines/jdk-25.0.1+8/Contents/Home
 
 allprojects {
 
@@ -31,7 +31,7 @@ allprojects {
     }
 
     wrapper {
-        gradleVersion = '9.5.1'
+        gradleVersion = '9.6.1'
     }
 }
 
@@ -43,14 +43,22 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
+        // Only need `options.release` set for `compileJava`, not for tests
+        options.debug = true
+        options.debugOptions.debugLevel = 'source,vars,lines'
+        options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
     }
 
     test {
         useJUnitPlatform()
+        // 固定测试 locale：部分用例断言的是英文资源文案（如 ErrorStripTest 期望 "Line: 1"），
+        // 在非英文环境下运行会失败。固定为 en/US 保证测试与运行环境语言无关。
+        systemProperty 'user.language', 'en'
+        systemProperty 'user.country', 'US'
     }
 
     checkstyle {
-        toolVersion = '12.3.1'
+        toolVersion = '13.8.0'
         configDirectory = file("$rootProject.projectDir/config/checkstyle")
     }
 
@@ -81,7 +89,7 @@ subprojects {
     }
 
     dependencies {
-        testImplementation platform('org.junit:junit-bom:6.1.0')
+        testImplementation platform('org.junit:junit-bom:6.1.1')
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
         testImplementation 'org.mockito:mockito-core:5.23.0'
@@ -89,9 +97,6 @@ subprojects {
 
     compileJava {
         options.release = Integer.parseInt(javaLanguageVersion)
-        options.debug = true
-        options.debugOptions.debugLevel = 'source,vars,lines'
-        options.compilerArgs << '-Xlint:deprecation' << '-Xlint:unchecked'
     }
 }
 

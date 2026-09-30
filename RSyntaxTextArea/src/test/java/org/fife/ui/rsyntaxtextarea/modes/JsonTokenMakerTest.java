@@ -1,6 +1,4 @@
 /*
- * 03/15/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -245,6 +243,12 @@ class JsonTokenMakerTest extends AbstractCDerivedTokenMakerTest {
 			Assertions.assertEquals(TokenTypes.ERROR_STRING_DOUBLE, token.getType());
 		}
 
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}[]", createTokenMaker().getBracketPairs());
 	}
 
 

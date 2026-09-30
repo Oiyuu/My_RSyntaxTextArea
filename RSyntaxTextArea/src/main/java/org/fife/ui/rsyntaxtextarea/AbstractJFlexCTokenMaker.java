@@ -57,6 +57,12 @@ public abstract class AbstractJFlexCTokenMaker extends AbstractJFlexTokenMaker {
 	}
 
 
+	@Override
+	public String getBracketPairs() {
+		return "{}()[]";
+	}
+
+
 	/**
 	 * Returns <code>true</code> always as C-style languages use curly braces
 	 * to denote code blocks.
@@ -84,7 +90,7 @@ public abstract class AbstractJFlexCTokenMaker extends AbstractJFlexTokenMaker {
 
 	@Override
 	public boolean getMarkOccurrencesOfTokenType(int type) {
-		return type==Token.IDENTIFIER || type==Token.FUNCTION;
+		return type==TokenTypes.IDENTIFIER || type==TokenTypes.FUNCTION;
 	}
 
 
@@ -146,8 +152,8 @@ public abstract class AbstractJFlexCTokenMaker extends AbstractJFlexTokenMaker {
 			}
 
 			// Only in MLC's should we try this
-			if (type==Token.COMMENT_DOCUMENTATION ||
-					type==Token.COMMENT_MULTILINE) {
+			if (type==TokenTypes.COMMENT_DOCUMENTATION ||
+					type==TokenTypes.COMMENT_MULTILINE) {
 				insertBreakInMLC(e, rsta, line);
 			}
 			else {
