@@ -1,4 +1,6 @@
 # RSyntaxTextArea
+[简体中文文档](./README.zh-CN.md)
+
 ![Java Build](https://github.com/bobbylight/RSyntaxTextArea/actions/workflows/gradle.yml/badge.svg)
 ![Java Build](https://github.com/bobbylight/RSyntaxTextArea/actions/workflows/codeql-analysis.yml/badge.svg)
 ![Maven Central](https://maven-badges.sml.io/sonatype-central/com.fifesoft/rsyntaxtextarea/badge.svg)
