@@ -8,9 +8,8 @@ import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.*;
 
 /**
- * A simple example showing how to do search and replace in a RSyntaxTextArea.
- * The toolbar isn't very user-friendly, but this is just to show you how to use
- * the API.
+ * 一个简单的示例，演示如何在 RSyntaxTextArea 中执行查找与替换。
+ * 工具栏并不怎么友好，这里只是为了展示 API 的用法。
  */
 public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 
@@ -33,26 +32,25 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 		RTextScrollPane sp = new RTextScrollPane(textArea);
 		cp.add(sp);
 
-		// Create a toolbar with searching options.
+		// 创建带搜索选项的工具栏
 		JToolBar toolBar = new JToolBar();
 		searchField = new JTextField(30);
 		toolBar.add(searchField);
-		final JButton nextButton = new JButton("Find Next");
+		final JButton nextButton = new JButton("查找下一个");
 		nextButton.setActionCommand("FindNext");
 		nextButton.addActionListener(this);
 		toolBar.add(nextButton);
-		JButton prevButton = new JButton("Find Previous");
+		JButton prevButton = new JButton("查找上一个");
 		prevButton.setActionCommand("FindPrev");
 		prevButton.addActionListener(this);
 		toolBar.add(prevButton);
-		regexCB = new JCheckBox("Regex");
+		regexCB = new JCheckBox("正则表达式");
 		toolBar.add(regexCB);
-		matchCaseCB = new JCheckBox("Match Case");
+		matchCaseCB = new JCheckBox("区分大小写");
 		toolBar.add(matchCaseCB);
 		cp.add(toolBar, BorderLayout.NORTH);
 
-		// Make Enter and Shift + Enter search forward and backward,
-		// respectively, when the search field is focused.
+		// 当搜索框获得焦点时，回车向后搜索，Shift + 回车向前搜索
 		InputMap im = searchField.getInputMap();
 		ActionMap am = searchField.getActionMap();
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "searchForward");
@@ -70,7 +68,7 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 			}
 		});
 
-		// Make Ctrl+F/Cmd+F focus the search field
+		// 让 Ctrl+F / Cmd+F 聚焦搜索框
 		int defaultMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		im = textArea.getInputMap();
 		am = textArea.getActionMap();
@@ -83,7 +81,7 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 		});
 
 		setContentPane(cp);
-		setTitle("Find and Replace Demo");
+		setTitle("查找与替换演示");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		pack();
 		setLocationByPlatform(true);
@@ -93,11 +91,11 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		// "FindNext" => search forward, "FindPrev" => search backward
+		// "FindNext" 表示向后搜索，"FindPrev" 表示向前搜索
 		String command = e.getActionCommand();
 		boolean forward = "FindNext".equals(command);
 
-		// Create an object defining our search parameters.
+		// 创建定义搜索参数的对象
 		SearchContext context = new SearchContext();
 		String text = searchField.getText();
 		if (text.isEmpty()) {
@@ -111,18 +109,18 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 
 		boolean found = SearchEngine.find(textArea, context).wasFound();
 		if (!found) {
-			JOptionPane.showMessageDialog(this, "Text not found");
+			JOptionPane.showMessageDialog(this, "未找到指定文本");
 		}
 
 	}
 
 	public static void main(String[] args) {
-		// Start all Swing applications on the EDT.
+		// 所有 Swing 应用都应在 EDT 上启动
 		SwingUtilities.invokeLater(() -> {
 			try {
 				String laf = UIManager.getSystemLookAndFeelClassName();
 				UIManager.setLookAndFeel(laf);
-			} catch (Exception e) { /* never happens */ }
+			} catch (Exception e) { /* 不会发生 */ }
 			FindAndReplaceDemo demo = new FindAndReplaceDemo();
 			demo.setVisible(true);
 			demo.textArea.requestFocusInWindow();
