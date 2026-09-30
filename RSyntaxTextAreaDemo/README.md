@@ -1,3 +1,5 @@
+[简体中文文档](./README.zh-CN.md)
+
 This is a set of simple demo applications for
 [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea).
 
