@@ -1,6 +1,4 @@
 /*
- * 03/22/2019
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -156,5 +154,11 @@ class CsvTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		Token token = tm.getTokenList(segment, TokenTypes.NULL, 0);
 
 		Assertions.assertTrue(token.is(TokenTypes.IDENTIFIER, "\"quoted \"\" string\""));
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("", createTokenMaker().getBracketPairs());
 	}
 }

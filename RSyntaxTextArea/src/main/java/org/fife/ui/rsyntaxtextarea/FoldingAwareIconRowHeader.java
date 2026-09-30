@@ -1,9 +1,4 @@
 /*
- * 03/07/2012
- *
- * FoldingAwareIconRowHeader - Icon row header that paints itself correctly
- * even when code folding is enabled.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -203,7 +198,7 @@ public class FoldingAwareIconRowHeader extends IconRowHeader {
 		//boolean currentLineHighlighted = textArea.getHighlightCurrentLine();
 		Document doc = textArea.getDocument();
 		Element root = doc.getDefaultRootElement();
-		int topPosition = textArea.viewToModel(
+		int topPosition = textArea.viewToModel2D(
 								new Point(visibleRect.x,visibleRect.y));
 		int topLine = root.getElementIndex(topPosition);
 

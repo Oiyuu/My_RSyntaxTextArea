@@ -1,6 +1,4 @@
 /*
- * 10/18/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -41,9 +39,9 @@ class RtfGeneratorTest {
 	@Test
 	void testHappyPath() {
 
-		RtfGenerator generator = new RtfGenerator(Color.white);
+		RtfGenerator generator = new RtfGenerator(Color.WHITE);
 		generator.appendToDoc(SIMPLE_TEXT.get(0), null, null, null);
-		generator.appendToDoc(SIMPLE_TEXT.get(1), null, Color.red, null);
+		generator.appendToDoc(SIMPLE_TEXT.get(1), null, Color.RED, null);
 		generator.appendToDoc(SIMPLE_TEXT.get(2), null, null, null);
 
 		// We can't do an exact string comparison due to differing default fonts on different OS's
@@ -52,7 +50,7 @@ class RtfGeneratorTest {
 
 	@Test
 	void testNon7BitAscii() {
-		RtfGenerator generator = new RtfGenerator(Color.white);
+		RtfGenerator generator = new RtfGenerator(Color.WHITE);
 		generator.appendToDoc("\u6c49", null, null, null);
 		String rtf = generator.getRtf();
 		int firstNewline = rtf.indexOf('\n');

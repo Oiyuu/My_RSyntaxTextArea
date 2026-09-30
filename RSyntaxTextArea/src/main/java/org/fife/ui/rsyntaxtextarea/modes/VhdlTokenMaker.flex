@@ -20,6 +20,7 @@ import javax.swing.text.Segment;
 import org.fife.ui.rsyntaxtextarea.AbstractJFlexTokenMaker;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.TokenImpl;
+import org.fife.ui.rsyntaxtextarea.TokenTypes;
 
  
  
@@ -83,7 +84,13 @@ import org.fife.ui.rsyntaxtextarea.TokenImpl;
 		super.addToken(array, start, end, tokenType, startOffset);
 		zzStartRead = zzMarkedPos;
 	}
-	
+
+	@Override
+	public String getBracketPairs() {
+		return "()";
+	}
+
+
 		@Override
 	public String[] getLineCommentStartAndEnd(int languageIndex) {
 		return new String[] { "--", null };
@@ -274,7 +281,7 @@ Comment = "--".*
 "wait" |
 "when" |
 "while" |
-"with"  { addToken(Token.RESERVED_WORD); }
+"with"  { addToken(TokenTypes.RESERVED_WORD); }
 
 /* Keywords 2 (JUST AN OPTIONAL SET OF KEYWORDS COLORED DIFFERENTLY) */
 "'ACTIVE" |
@@ -306,18 +313,18 @@ Comment = "--".*
 "'SUCCESS" |
 "'TRANSACTION" |
 "'VAL" |
-"'VALUE"    { addToken(Token.RESERVED_WORD); }
+"'VALUE"    { addToken(TokenTypes.RESERVED_WORD); }
 
 /* Numbers */
-{integer_literal}    { addToken(Token.LITERAL_NUMBER_DECIMAL_INT) ;}
-{binary_literal}     { addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }
-{octal_literal}      { addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }
-{hex_literal}        { addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }
-{exponent}           { addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }
-{floatnumber}        { addToken(Token.LITERAL_NUMBER_DECIMAL_INT); }
+{integer_literal}    { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT) ;}
+{binary_literal}     { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT); }
+{octal_literal}      { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT); }
+{hex_literal}        { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT); }
+{exponent}           { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT); }
+{floatnumber}        { addToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT); }
 
 /* WhiteSpace */
-{WhiteSpace}+        { addToken(Token.WHITESPACE); }
+{WhiteSpace}+        { addToken(TokenTypes.WHITESPACE); }
 
  /* Separators */
 "(" |
@@ -330,7 +337,7 @@ Comment = "--".*
 "|" |
 "=>"|
 "<="|
-":="                 { addToken(Token.SEPARATOR); }
+":="                 { addToken(TokenTypes.SEPARATOR); }
 
 /* Data Types */
 "bit" |
@@ -343,7 +350,7 @@ Comment = "--".*
 "std_logic" |
 "std_logic_unsigned" |
 "std_logic_vector" |
-"std_logic_signed"		{ addToken(Token.DATA_TYPE); }
+"std_logic_signed"		{ addToken(TokenTypes.DATA_TYPE); }
 	
 /* Functions */
 "'-'" |
@@ -356,7 +363,7 @@ Comment = "--".*
 "'X'" |
 "'Z'" |
 "false" |
-"true"		{ addToken(Token.FUNCTION); }
+"true"		{ addToken(TokenTypes.FUNCTION); }
 
 /* OPERATORS. */
 "&" |
@@ -376,18 +383,18 @@ Comment = "--".*
 "nand" |
 "nor" |
 "xor" |
-"xnor"		{ addToken(Token.OPERATOR); }
+"xnor"		{ addToken(TokenTypes.OPERATOR); }
 
 /* String/Character Literals. */
-{stringliteral}				{ addToken(Token.LITERAL_STRING_DOUBLE_QUOTE); }
+{stringliteral}				{ addToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE); }
 
 /*COMMENTS*/
-{Comment}                 {  addToken(Token.COMMENT_EOL); }
+{Comment}                 {  addToken(TokenTypes.COMMENT_EOL); }
 
 
-{Identifier}             { addToken(Token.IDENTIFIER);}
+{Identifier}             { addToken(TokenTypes.IDENTIFIER);}
 
-.                        { addToken(Token.ERROR_IDENTIFIER); }
+.                        { addToken(TokenTypes.ERROR_IDENTIFIER); }
 
 {LineTerminator}         { addNullToken(); return firstToken; }
 

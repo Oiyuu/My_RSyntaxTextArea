@@ -1,8 +1,4 @@
 /*
- * 07/28/2008
- *
- * RtfGenerator.java - Generates RTF via a simple Java API.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -107,23 +103,6 @@ public class RtfGenerator {
 	 */
 	public void appendToDoc(String text, Font f, Color fg, Color bg) {
 		appendToDoc(text, f, fg, bg, false);
-	}
-
-
-	/**
-	 * Appends styled text to the RTF document being generated.
-	 *
-	 * @param text The text to append.
-	 * @param f The font of the text.  If this is <code>null</code>, the
-	 *        default font is used.
-	 * @param bg The background color of the text.  If this is
-	 *        <code>null</code>, the default background color is used.
-	 * @param underline Whether the text should be underlined.
-	 * @see #appendNewline()
-	 */
-	public void appendToDocNoFG(String text, Font f, Color bg,
-							boolean underline) {
-		appendToDoc(text, f, null, bg, underline, false);
 	}
 
 
@@ -253,6 +232,23 @@ public class RtfGenerator {
 
 		}
 
+	}
+
+
+	/**
+	 * Appends styled text to the RTF document being generated.
+	 *
+	 * @param text The text to append.
+	 * @param f The font of the text.  If this is <code>null</code>, the
+	 *        default font is used.
+	 * @param bg The background color of the text.  If this is
+	 *        <code>null</code>, the default background color is used.
+	 * @param underline Whether the text should be underlined.
+	 * @see #appendNewline()
+	 */
+	public void appendToDocNoFG(String text, Font f, Color bg,
+	                            boolean underline) {
+		appendToDoc(text, f, null, bg, underline, false);
 	}
 
 

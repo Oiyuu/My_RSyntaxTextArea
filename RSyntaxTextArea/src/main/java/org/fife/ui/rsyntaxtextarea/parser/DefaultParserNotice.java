@@ -1,8 +1,4 @@
 /*
- * 08/11/2009
- *
- * DefaultParserNotice.java - Base implementation of a parser notice.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -35,7 +31,7 @@ public class DefaultParserNotice implements ParserNotice {
 	private static final Color[] DEFAULT_COLORS = {
 		new Color(255, 0, 128),		// Error
 		new Color(244, 200, 45),	// Warning
-		Color.gray,					// Info
+		Color.GRAY,					// Info
 	};
 
 

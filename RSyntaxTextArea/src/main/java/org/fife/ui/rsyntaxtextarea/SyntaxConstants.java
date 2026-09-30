@@ -1,8 +1,4 @@
 /*
- * 03/08/2004
- *
- * SyntaxConstants.java - Constants used by RSyntaxTextArea and friends.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -122,6 +118,12 @@ public interface SyntaxConstants {
 	 * Style for highlighting DTD files.
 	 */
 	String SYNTAX_STYLE_DTD			= "text/dtd";
+
+
+	/**
+	 * Style for highlighting .env files.
+	 */
+	String SYNTAX_STYLE_ENV		= "text/env";
 
 
 	/**

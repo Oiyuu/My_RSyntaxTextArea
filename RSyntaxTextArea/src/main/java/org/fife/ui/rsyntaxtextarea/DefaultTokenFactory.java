@@ -1,8 +1,4 @@
 /*
- * 10/28/2004
- *
- * DefaultTokenFactory.java - Default token factory.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -89,7 +85,7 @@ class DefaultTokenFactory implements TokenFactory {
 	public TokenImpl createToken() {
 		TokenImpl token = tokenList[currentFreeToken];
 		token.text = null;
-		token.setType(Token.NULL);
+		token.setType(TokenTypes.NULL);
 		token.setOffset(-1);
 		token.setNextToken(null);
 		currentFreeToken++;

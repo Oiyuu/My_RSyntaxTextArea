@@ -1,6 +1,4 @@
 /*
- * 03/14/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -372,6 +370,37 @@ class RSyntaxTextAreaTest extends AbstractRSyntaxTextAreaTest {
 
 
 	@Test
+	void testGetEOLMarker_default() {
+		RSyntaxTextArea textArea = new RSyntaxTextArea();
+		Assertions.assertEquals("\u21b2", textArea.getEOLMarker());
+	}
+
+
+	@Test
+	void testSetEOLMarker() {
+		RSyntaxTextArea textArea = new RSyntaxTextArea();
+		textArea.setEOLMarker("\u263a");
+		Assertions.assertEquals("\u263a", textArea.getEOLMarker());
+	}
+
+
+	@Test
+	void testSetEOLMarker_null() {
+		RSyntaxTextArea textArea = new RSyntaxTextArea();
+		Assertions.assertThrows(IllegalArgumentException.class,
+			() -> textArea.setEOLMarker(null));
+	}
+
+
+	@Test
+	void testSetEOLMarker_empty() {
+		RSyntaxTextArea textArea = new RSyntaxTextArea();
+		Assertions.assertThrows(IllegalArgumentException.class,
+			() -> textArea.setEOLMarker(""));
+	}
+
+
+	@Test
 	void testGetSetRightHandSideCorrection() {
 		RSyntaxTextArea textArea = createTextArea();
 		Assertions.assertEquals(0, textArea.getRightHandSideCorrection());
@@ -524,8 +553,8 @@ class RSyntaxTextAreaTest extends AbstractRSyntaxTextAreaTest {
 	@Test
 	void testHyperlinkForeground() {
 		RSyntaxTextArea textArea = new RSyntaxTextArea();
-		textArea.setHyperlinkForeground(Color.pink);
-		Assertions.assertEquals(Color.pink, textArea.getHyperlinkForeground());
+		textArea.setHyperlinkForeground(Color.PINK);
+		Assertions.assertEquals(Color.PINK, textArea.getHyperlinkForeground());
 	}
 
 
@@ -589,8 +618,8 @@ class RSyntaxTextAreaTest extends AbstractRSyntaxTextAreaTest {
 	void testMarkOccurrencesColor() {
 		RSyntaxTextArea textArea = new RSyntaxTextArea();
 		textArea.setMarkOccurrences(true);
-		textArea.setMarkOccurrencesColor(Color.pink);
-		Assertions.assertEquals(Color.pink, textArea.getMarkOccurrencesColor());
+		textArea.setMarkOccurrencesColor(Color.PINK);
+		Assertions.assertEquals(Color.PINK, textArea.getMarkOccurrencesColor());
 	}
 
 
@@ -623,16 +652,16 @@ class RSyntaxTextAreaTest extends AbstractRSyntaxTextAreaTest {
 	@Test
 	void testMatchedBracketBGColor() {
 		RSyntaxTextArea textArea = new RSyntaxTextArea();
-		textArea.setMatchedBracketBGColor(Color.pink);
-		Assertions.assertEquals(Color.pink, textArea.getMatchedBracketBGColor());
+		textArea.setMatchedBracketBGColor(Color.PINK);
+		Assertions.assertEquals(Color.PINK, textArea.getMatchedBracketBGColor());
 	}
 
 
 	@Test
 	void testMatchedBracketBorderColor() {
 		RSyntaxTextArea textArea = new RSyntaxTextArea();
-		textArea.setMatchedBracketBorderColor(Color.pink);
-		Assertions.assertEquals(Color.pink, textArea.getMatchedBracketBorderColor());
+		textArea.setMatchedBracketBorderColor(Color.PINK);
+		Assertions.assertEquals(Color.PINK, textArea.getMatchedBracketBorderColor());
 	}
 
 
@@ -821,8 +850,8 @@ class RSyntaxTextAreaTest extends AbstractRSyntaxTextAreaTest {
 	@Test
 	void testTabLineColor() {
 		RSyntaxTextArea textArea = createTextArea();
-		textArea.setTabLineColor(Color.blue);
-		Assertions.assertEquals(Color.blue, textArea.getTabLineColor());
+		textArea.setTabLineColor(Color.BLUE);
+		Assertions.assertEquals(Color.BLUE, textArea.getTabLineColor());
 	}
 
 

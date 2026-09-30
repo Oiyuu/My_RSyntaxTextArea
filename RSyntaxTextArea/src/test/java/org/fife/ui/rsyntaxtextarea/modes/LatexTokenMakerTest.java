@@ -1,6 +1,4 @@
 /*
- * 09/20/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -55,5 +53,11 @@ class LatexTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		String[] startAndEnd = createTokenMaker().getLineCommentStartAndEnd(0);
 		Assertions.assertEquals("%", startAndEnd[0]);
 		Assertions.assertNull(startAndEnd[1]);
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}[]", createTokenMaker().getBracketPairs());
 	}
 }

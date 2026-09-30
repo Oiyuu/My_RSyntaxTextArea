@@ -1,9 +1,4 @@
 /*
- * 11/25/2008
- *
- * TextEditorPane.java - A syntax highlighting text area that has knowledge of
- * the file it is editing on disk.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -24,6 +19,7 @@ import javax.swing.text.Document;
 import org.fife.io.UnicodeReader;
 import org.fife.io.UnicodeWriter;
 import org.fife.ui.rtextarea.RTextAreaEditorKit;
+import org.fife.ui.rtextarea.TextMode;
 
 /**
  * An extension of {@link org.fife.ui.rsyntaxtextarea.RSyntaxTextArea}
@@ -131,17 +127,16 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	 * Constructor.  The file will be given a default name.
 	 */
 	public TextEditorPane() {
-		this(INSERT_MODE);
+		this(TextMode.INSERT);
 	}
 
 
 	/**
 	 * Constructor.  The file will be given a default name.
 	 *
-	 * @param textMode Either <code>INSERT_MODE</code> or
-	 *        <code>OVERWRITE_MODE</code>.
+	 * @param textMode The text mode.
 	 */
-	public TextEditorPane(int textMode) {
+	public TextEditorPane(TextMode textMode) {
 		this(textMode, false);
 	}
 
@@ -150,11 +145,10 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	 * Creates a new <code>TextEditorPane</code>.  The file will be given
 	 * a default name.
 	 *
-	 * @param textMode Either <code>INSERT_MODE</code> or
-	 *        <code>OVERWRITE_MODE</code>.
+	 * @param textMode The text mode.
 	 * @param wordWrapEnabled Whether to use word wrap in this pane.
 	 */
-	public TextEditorPane(int textMode, boolean wordWrapEnabled) {
+	public TextEditorPane(TextMode textMode, boolean wordWrapEnabled) {
 		super(textMode);
 		setLineWrap(wordWrapEnabled);
 		try {
@@ -168,8 +162,7 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	/**
 	 * Creates a new <code>TextEditorPane</code>.
 	 *
-	 * @param textMode Either <code>INSERT_MODE</code> or
-	 *        <code>OVERWRITE_MODE</code>.
+	 * @param textMode The text mode.
 	 * @param wordWrapEnabled Whether to use word wrap in this pane.
 	 * @param loc The location of the text file being edited.  If this value
 	 *        is <code>null</code>, a file named "Untitled.txt" in the current
@@ -178,7 +171,7 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	 *         <code>loc</code>.  This of course won't happen if
 	 *         <code>loc</code> is <code>null</code>.
 	 */
-	public TextEditorPane(int textMode, boolean wordWrapEnabled,
+	public TextEditorPane(TextMode textMode, boolean wordWrapEnabled,
 							FileLocation loc) throws IOException {
 		this(textMode, wordWrapEnabled, loc, null);
 	}
@@ -187,8 +180,7 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	/**
 	 * Creates a new <code>TextEditorPane</code>.
 	 *
-	 * @param textMode Either <code>INSERT_MODE</code> or
-	 *        <code>OVERWRITE_MODE</code>.
+	 * @param textMode The text mode.
 	 * @param wordWrapEnabled Whether to use word wrap in this pane.
 	 * @param loc The location of the text file being edited.  If this value
 	 *        is <code>null</code>, a file named "Untitled.txt" in the current
@@ -201,7 +193,7 @@ public class TextEditorPane extends RSyntaxTextArea implements
 	 *         <code>loc</code>.  This of course won't happen if
 	 *         <code>loc</code> is <code>null</code>.
 	 */
-	public TextEditorPane(int textMode, boolean wordWrapEnabled,
+	public TextEditorPane(TextMode textMode, boolean wordWrapEnabled,
 				FileLocation loc, String defaultEnc) throws IOException {
 		super(textMode);
 		setLineWrap(wordWrapEnabled);

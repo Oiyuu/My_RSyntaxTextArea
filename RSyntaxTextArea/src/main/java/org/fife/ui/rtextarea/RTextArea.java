@@ -1,24 +1,18 @@
 /*
- * 11/14/2003
- *
- * RTextArea.java - An extension of JTextArea that adds many features.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rtextarea;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Reader;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -37,7 +31,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.fife.print.RPrintUtilities;
-import org.fife.ui.rsyntaxtextarea.DocumentRange;
 import org.fife.ui.rtextarea.Macro.MacroRecord;
 
 
@@ -67,20 +60,6 @@ import org.fife.ui.rtextarea.Macro.MacroRecord;
  * @version 1.0
  */
 public class RTextArea extends RTextAreaBase implements Printable {
-
-	/**
-	 * Constant representing insert mode.
-	 *
-	 * @see #setCaretStyle(int, CaretStyle)
-	 */
-	public static final int INSERT_MODE = 0;
-
-	/**
-	 * Constant representing overwrite mode.
-	 *
-	 * @see #setCaretStyle(int, CaretStyle)
-	 */
-	public static final int OVERWRITE_MODE = 1;
 
 	/**
 	 * The property fired when the "mark all" color changes.
@@ -114,10 +93,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 
 	private static final Color DEFAULT_MARK_ALL_COLOR = new Color(0xffc800);
 
-	/**
-	 * The current text mode ({@link #INSERT_MODE} or {@link #OVERWRITE_MODE}).
-	 */
-	private int textMode;
+	private TextMode textMode;
 
 	// All macros are shared across all RTextAreas.
 	private static boolean recordingMacro;		// Whether we're recording a macro.
@@ -170,7 +146,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 
 	private boolean markAllOnOccurrenceSearches;
 
-	private CaretStyle[] carets; // Index 0=>insert caret, 1=>overwrite.
+	private EnumMap<TextMode, CaretStyle> carets;
 
 	private static final String MSG	= "org.fife.ui.rtextarea.RTextArea";
 
@@ -247,10 +223,9 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	/**
 	 * Creates a new <code>RTextArea</code>.
 	 *
-	 * @param textMode Either <code>INSERT_MODE</code> or
-	 *        <code>OVERWRITE_MODE</code>.
+	 * @param textMode The text mode.
 	 */
-	public RTextArea(int textMode) {
+	public RTextArea(TextMode textMode) {
 		setTextMode(textMode);
 	}
 
@@ -531,12 +506,8 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	 * @param size The number of spaces.
 	 * @return The string of spaces.
 	 */
-	private String createSpacer(int size) {
-		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<size; i++) {
-			sb.append(' ');
-		}
-		return sb.toString();
+	private static String createSpacer(int size) {
+		return " ".repeat(Math.max(0, size));
 	}
 
 
@@ -719,10 +690,10 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	public static int getDefaultModifier() {
 
 		// Allow for headless environments, e.g. unit tests
-		int modifier = RTextAreaBase.isOSX() ? Event.META_MASK : Event.CTRL_MASK;
+		int modifier = RTextAreaBase.isOSX() ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 
 		try {
-			modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		} catch (HeadlessException e) {
 			// Do nothing; take default value
 		}
@@ -827,10 +798,10 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	/**
 	 * Returns the text mode this editor pane is currently in.
 	 *
-	 * @return Either {@link #INSERT_MODE} or {@link #OVERWRITE_MODE}.
-	 * @see #setTextMode(int)
+	 * @return The text mode.
+	 * @see #setTextMode(TextMode)
 	 */
-	public final int getTextMode() {
+	public final TextMode getTextMode() {
 		return textMode;
 	}
 
@@ -866,6 +837,17 @@ public class RTextArea extends RTextAreaBase implements Printable {
 			tip = getToolTipSupplier().getToolTipText(this, e);
 		}
 		return tip!=null ? tip : super.getToolTipText();
+	}
+
+
+	/**
+	 * Returns the undo manager used by this text area.
+	 *
+	 * @return The undo manager.
+	 * @see #createUndoManager()
+	 */
+	public RUndoManager getUndoManager() {
+		return undoManager;
 	}
 
 
@@ -906,12 +888,12 @@ public class RTextArea extends RTextAreaBase implements Printable {
 		markAllHighlightPainter = new SmartHighlightPainter(
 										markAllHighlightColor);
 		setMarkAllHighlightColor(markAllHighlightColor);
-		carets = new CaretStyle[2];
-		setCaretStyle(INSERT_MODE, CaretStyle.THICK_VERTICAL_LINE_STYLE);
-		setCaretStyle(OVERWRITE_MODE, CaretStyle.BLOCK_STYLE);
+		carets = new EnumMap<>(TextMode.class);
+		setCaretStyle(TextMode.INSERT, CaretStyle.THICK_VERTICAL_LINE_STYLE);
+		setCaretStyle(TextMode.OVERWRITE, CaretStyle.BLOCK_STYLE);
 		setDragEnabled(!GraphicsEnvironment.isHeadless());
 
-		setTextMode(INSERT_MODE); // Carets array must be created first!
+		setTextMode(TextMode.INSERT); // Carets map must be populated first!
 		setMarkAllOnOccurrenceSearches(true);
 
 		// Fix the odd "Ctrl+H <=> Backspace" Java behavior.
@@ -1036,11 +1018,12 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	 *
 	 * @param g The context into which the page is drawn.
 	 * @param pageFormat The size and orientation of the page being drawn.
-	 * @param pageIndex The zero based index of the page to be drawn.
+	 * @param pageIndex The zero-based index of the page to be drawn.
 	 */
 	@Override
 	public int print(Graphics g, PageFormat pageFormat, int pageIndex) {
-		return RPrintUtilities.printDocumentWordWrap(g, this, getFont(), pageIndex, pageFormat, getTabSize());
+		Graphics2D g2d = (Graphics2D)g;
+		return RPrintUtilities.printDocumentWordWrap(g2d, this, getFont(), pageIndex, pageFormat, getTabSize());
 	}
 
 
@@ -1218,7 +1201,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	/**
 	 * This method overrides <code>JTextComponent</code>'s
 	 * <code>replaceSelection</code>, so that if <code>textMode</code> is
-	 * {@link #OVERWRITE_MODE}, it actually overwrites.
+	 * {@code OVERWRITE_MODE}, it actually overwrites.
 	 *
 	 * @param text The content to replace the selection with.
 	 */
@@ -1244,7 +1227,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 		}
 
 		// If the user wants to overwrite text...
-		if (textMode==OVERWRITE_MODE && !"\n".equals(text)) {
+		if (textMode==TextMode.OVERWRITE && !"\n".equals(text)) {
 
 			Caret caret = getCaret();
 			int caretPos = caret.getDot();
@@ -1274,7 +1257,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 				ble.printStackTrace();
 			}
 
-		} // End of if (textMode==OVERWRITE_MODE).
+		} // End of if (textMode==TextMode.OVERWRITE).
 
 		// Now, actually do the inserting/replacing.  Our undoManager will
 		// take care of remembering the remove/insert as atomic if we are in
@@ -1439,14 +1422,14 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	 * user toggles between insert and overwrite modes.
 	 *
 	 * @param caret The caret to use.
-	 * @see #setCaretStyle(int, CaretStyle)
+	 * @see #setCaretStyle(TextMode, CaretStyle)
 	 */
 	@Override
 	public void setCaret(Caret caret) {
 		super.setCaret(caret);
 		if (carets!=null && // Called by setUI() before carets is initialized
 				caret instanceof ConfigurableCaret) {
-			((ConfigurableCaret)caret).setStyle(carets[getTextMode()]);
+			((ConfigurableCaret)caret).setStyle(carets.get(getTextMode()));
 		}
 	}
 
@@ -1454,15 +1437,15 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	/**
 	 * Sets the style of caret used when in insert or overwrite mode.
 	 *
-	 * @param mode Either {@link #INSERT_MODE} or {@link #OVERWRITE_MODE}.
+	 * @param mode The text mode.
 	 * @param style The style for the caret.
 	 * @see ConfigurableCaret
 	 */
-	public void setCaretStyle(int mode, CaretStyle style) {
+	public void setCaretStyle(TextMode mode, CaretStyle style) {
 		if (style==null) {
 			style = CaretStyle.THICK_VERTICAL_LINE_STYLE;
 		}
-		carets[mode] = style;
+		carets.put(mode, style);
 		if (mode==getTextMode() && getCaret() instanceof ConfigurableCaret) {
 			// Will repaint the caret if necessary.
 			((ConfigurableCaret)getCaret()).setStyle(style);
@@ -1625,19 +1608,15 @@ public class RTextArea extends RTextAreaBase implements Printable {
 	 * automatically updated to render itself appropriately for the new text
 	 * mode.
 	 *
-	 * @param mode Either {@link #INSERT_MODE} or {@link #OVERWRITE_MODE}.
+	 * @param mode The text mode.
 	 * @see #getTextMode()
 	 */
-	public void setTextMode(int mode) {
-
-		if (mode!=INSERT_MODE && mode!=OVERWRITE_MODE) {
-			mode = INSERT_MODE;
-		}
+	public void setTextMode(TextMode mode) {
 
 		if (textMode != mode) {
 			Caret caret = getCaret();
 			if (caret instanceof ConfigurableCaret) {
-				((ConfigurableCaret)caret).setStyle(carets[mode]);
+				((ConfigurableCaret)caret).setStyle(carets.get(mode));
 			}
 			textMode = mode;
 			// Prevent the caret from blinking while e.g. holding down the
@@ -1749,7 +1728,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 			// WORKAROUND:  Since JTextComponent only updates the caret
 			// location on mouse clicked and released, we'll do it on dragged
 			// events when the left mouse button is clicked.
-			if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
+			if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
 				Caret caret = getCaret();
 				dot = caret.getDot();
 				mark = caret.getMark();
@@ -1762,7 +1741,7 @@ public class RTextArea extends RTextAreaBase implements Printable {
 			if (e.isPopupTrigger()) { // OS X popup triggers are on pressed
 				showPopup(e);
 			}
-			else if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
+			else if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
 				Caret caret = getCaret();
 				dot = caret.getDot();
 				mark = caret.getMark();

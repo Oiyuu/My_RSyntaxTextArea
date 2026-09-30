@@ -1,6 +1,4 @@
 /*
- * 03/23/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -2905,6 +2903,12 @@ class JSPTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		Assertions.assertTrue(token.is(TokenTypes.MARKUP_TAG_NAME, "script"));
 		token = token.getNextToken();
 		Assertions.assertTrue(token.isSingleChar(TokenTypes.MARKUP_TAG_DELIMITER, '>'));
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}()[]", createTokenMaker().getBracketPairs());
 	}
 
 

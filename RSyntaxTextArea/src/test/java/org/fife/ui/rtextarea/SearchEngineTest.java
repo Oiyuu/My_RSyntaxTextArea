@@ -1,8 +1,4 @@
 /*
- * 05/12/2010
- *
- * SearchEngineTest.java - Test cases for SearchEngine.java
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -12,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.fife.ui.rsyntaxtextarea.DocumentRange;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import static org.junit.jupiter.api.Assertions.*;
 
