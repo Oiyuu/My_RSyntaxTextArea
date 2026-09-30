@@ -112,7 +112,10 @@
             <property name="accessModifiers" value="package"/>
         </module>
         -->
-        <module name="JavadocStyle"/>
+        <!-- endOfSentenceFormat 额外接受中文句号"。"，以支持中文 Javadoc -->
+        <module name="JavadocStyle">
+            <property name="endOfSentenceFormat" value="[。.?!][ \t\n\r\f&lt;]|$"/>
+        </module>
         <module name="AtclauseOrder"/>
         <module name="InvalidJavadocPosition"/>
         <module name="JavadocBlockTagLocation"/>
