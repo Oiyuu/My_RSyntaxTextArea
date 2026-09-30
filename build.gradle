@@ -51,6 +51,10 @@ subprojects {
 
     test {
         useJUnitPlatform()
+        // 固定测试 locale：部分用例断言的是英文资源文案（如 ErrorStripTest 期望 "Line: 1"），
+        // 在非英文环境下运行会失败。固定为 en/US 保证测试与运行环境语言无关。
+        systemProperty 'user.language', 'en'
+        systemProperty 'user.country', 'US'
     }
 
     checkstyle {
