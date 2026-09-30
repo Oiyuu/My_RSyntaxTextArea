@@ -5,7 +5,7 @@ import javax.swing.*;
 
 
 /**
- * Standalone version of the demo.
+ * 演示程序的独立运行版本。
  *
  * @author Robert Futrell
  * @version 1.0
@@ -16,7 +16,7 @@ public final class RSyntaxTextAreaDemoApp extends JFrame {
 	private RSyntaxTextAreaDemoApp() {
 		setRootPane(new DemoRootPane());
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setTitle("RSyntaxTextArea Demo Application");
+		setTitle("RSyntaxTextArea 演示程序");
 		pack();
 	}
 
@@ -27,7 +27,7 @@ public final class RSyntaxTextAreaDemoApp extends JFrame {
 				UIManager.setLookAndFeel(UIManager.
 										getSystemLookAndFeelClassName());
 			} catch (Exception e) {
-				e.printStackTrace(); // Never happens
+				e.printStackTrace(); // 不会发生
 			}
 			Toolkit.getDefaultToolkit().setDynamicLayout(true);
 			new RSyntaxTextAreaDemoApp().setVisible(true);

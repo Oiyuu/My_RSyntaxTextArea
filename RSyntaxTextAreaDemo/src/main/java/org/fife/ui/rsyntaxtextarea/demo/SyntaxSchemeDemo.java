@@ -9,13 +9,12 @@ import org.fife.ui.rtextarea.*;
 import org.fife.ui.rsyntaxtextarea.*;
 
 /**
- * A simple example showing how to modify the fonts and colors used in an
- * RSyntaxTextArea. There are two methods to do this - via the Java API, and via
- * an XML file. The latter method is preferred since it's more modular, and
- * provides a way for your users to customize RSTA in your application.<p>
+ * 一个简单的示例，演示如何修改 RSyntaxTextArea 中使用的字体与颜色。
+ * 有两种做法：通过 Java API，或通过 XML 文件。推荐后者，因为它更模块化，
+ * 并且能让你的用户在应用中自行定制 RSTA。<p>
  *
- * Project Home: http://fifesoft.com/rsyntaxtextarea<br>
- * Downloads: https://sourceforge.net/projects/rsyntaxtextarea
+ * 项目主页：http://fifesoft.com/rsyntaxtextarea<br>
+ * 下载地址：https://sourceforge.net/projects/rsyntaxtextarea
  */
 public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
 
@@ -44,23 +43,23 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
       textArea.setText(TEXT);
 
       JMenuBar mb = new JMenuBar();
-      JMenu menu = new JMenu("File");
+      JMenu menu = new JMenu("文件");
       mb.add(menu);
       JMenuItem changeStyleProgrammaticallyItem = new JMenuItem(
-            "Change Style Programmatically");
+            "通过代码修改样式");
       changeStyleProgrammaticallyItem
             .setActionCommand("ChangeProgrammatically");
       changeStyleProgrammaticallyItem.addActionListener(this);
       menu.add(changeStyleProgrammaticallyItem);
       JMenuItem changeStyleViaThemesItem = new JMenuItem(
-            "Change Style via Theme XML");
+            "通过主题 XML 修改样式");
       changeStyleViaThemesItem.setActionCommand("ChangeViaThemes");
       changeStyleViaThemesItem.addActionListener(this);
       menu.add(changeStyleViaThemesItem);
       setJMenuBar(mb);
 
       setContentPane(cp);
-      setTitle("Syntax Scheme Demo");
+      setTitle("语法配色方案演示");
       setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       pack();
       setLocationRelativeTo(null);
@@ -68,8 +67,7 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
    }
 
    /**
-    * Listens for the selection of a menu item and performs an action
-    * accordingly.
+    * 监听菜单项的选中事件，并执行相应的操作。
     */
    @Override
    public void actionPerformed(ActionEvent e) {
@@ -82,16 +80,16 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
    }
 
    /**
-    * Changes the styles used in the editor programmatically.
-	* Odd selections are purposely made here to show how different token
-	* types can have different fonts, etc.
+    * 通过代码修改编辑器中使用的样式。
+	* 这里故意做了一些奇怪的选择，用于展示不同类型的 token
+	* 可以拥有不同的字体等。
     */
    private void changeStyleProgrammatically() {
 
-      // Set the font for all token types.
+      // 为所有 token 类型设置字体
       setFont(textArea, new Font("Comic Sans MS", Font.PLAIN, 16));
 
-      // Change a few things here and there.
+      // 这里那里改几处样式
       SyntaxScheme scheme = textArea.getSyntaxScheme();
       scheme.getStyle(Token.RESERVED_WORD).background = Color.pink;
       scheme.getStyle(Token.DATA_TYPE).foreground = Color.blue;
@@ -104,24 +102,24 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
    }
 
    /**
-    * Changes the styles used by the editor via an XML file specification. This
-    * method is preferred because of its ease and modularity.
+    * 通过 XML 文件描述来修改编辑器使用的样式。
+    * 由于简单且模块化，推荐使用该方法。
     */
    private void changeStyleViaThemeXml() {
       try {
          Theme theme = Theme.load(getClass().getResourceAsStream(
                "/org/fife/ui/rsyntaxtextarea/themes/eclipse.xml"));
          theme.apply(textArea);
-      } catch (IOException ioe) { // Never happens
+      } catch (IOException ioe) { // 不会发生
          ioe.printStackTrace();
       }
    }
 
    /**
-    * Set the font for all token types.
+    * 为所有 token 类型设置字体。
     *
-    * @param textArea The text area to modify.
-    * @param font The font to use.
+    * @param textArea 要修改的文本区。
+    * @param font 要使用的字体。
     */
    private static void setFont(RSyntaxTextArea textArea, Font font) {
       if (font != null) {
@@ -138,7 +136,7 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
    }
 
    public static void main(String[] args) {
-      // Start all Swing applications on the EDT.
+      // 所有 Swing 应用都应在 EDT 上启动
       SwingUtilities.invokeLater(() -> new SyntaxSchemeDemo().setVisible(true));
    }
 
