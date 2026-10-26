@@ -1,6 +1,4 @@
 /*
- * 03/04/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -72,7 +70,7 @@ class LineHighlightManagerTest {
 		lhm.removeLineHighlight(tag1);
 		List<Object> remainingTags = lhm.getCurrentLineHighlightTags();
 		Assertions.assertEquals(1, remainingTags.size());
-		Assertions.assertSame(tag2, remainingTags.get(0));
+		Assertions.assertSame(tag2, remainingTags.getFirst());
 	}
 
 
@@ -89,7 +87,7 @@ class LineHighlightManagerTest {
 		lhm.removeLineHighlight(tag2);
 		List<Object> remainingTags = lhm.getCurrentLineHighlightTags();
 		Assertions.assertEquals(1, remainingTags.size());
-		Assertions.assertSame(tag1, remainingTags.get(0));
+		Assertions.assertSame(tag1, remainingTags.getFirst());
 	}
 
 

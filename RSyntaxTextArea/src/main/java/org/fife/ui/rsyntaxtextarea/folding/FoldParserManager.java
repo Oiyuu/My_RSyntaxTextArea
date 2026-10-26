@@ -1,9 +1,4 @@
 /*
- * 10/08/2011
- *
- * FoldParserManager.java - Used by RSTA to determine what fold parser to use
- * for each language it supports.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -79,15 +74,16 @@ public final class FoldParserManager implements SyntaxConstants {
 		map.put(SYNTAX_STYLE_CSS,				new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_D,					new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_DART,				new CurlyFoldParser());
+		map.put(SYNTAX_STYLE_ENV,				new LinesWithContentFoldParser());
 		map.put(SYNTAX_STYLE_GO,				new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_GROOVY,			new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_HTACCESS,			new XmlFoldParser());
-		map.put(SYNTAX_STYLE_HTML,				new HtmlFoldParser(HtmlFoldParser.LANGUAGE_HTML));
+		map.put(SYNTAX_STYLE_HTML,				new HtmlFoldParser(HtmlFoldParser.Language.HTML));
 		map.put(SYNTAX_STYLE_JAVA,				new CurlyFoldParser(true, true));
 		map.put(SYNTAX_STYLE_JAVASCRIPT,		new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_JSON,				new JsonFoldParser());
 		map.put(SYNTAX_STYLE_JSON_WITH_COMMENTS,new JsonFoldParser());
-		map.put(SYNTAX_STYLE_JSP,				new HtmlFoldParser(HtmlFoldParser.LANGUAGE_JSP));
+		map.put(SYNTAX_STYLE_JSP,				new HtmlFoldParser(HtmlFoldParser.Language.JSP));
 		map.put(SYNTAX_STYLE_KOTLIN,			new CurlyFoldParser(true, true));
 		map.put(SYNTAX_STYLE_LATEX,				new LatexFoldParser());
 		map.put(SYNTAX_STYLE_LESS,				new CurlyFoldParser());
@@ -95,7 +91,7 @@ public final class FoldParserManager implements SyntaxConstants {
 		map.put(SYNTAX_STYLE_MXML,				new XmlFoldParser());
 		map.put(SYNTAX_STYLE_NSIS,				new NsisFoldParser());
 		map.put(SYNTAX_STYLE_PERL,				new CurlyFoldParser());
-		map.put(SYNTAX_STYLE_PHP,				new HtmlFoldParser(HtmlFoldParser.LANGUAGE_PHP));
+		map.put(SYNTAX_STYLE_PHP,				new HtmlFoldParser(HtmlFoldParser.Language.PHP));
 		map.put(SYNTAX_STYLE_PROTO,				new CurlyFoldParser());
 		map.put(SYNTAX_STYLE_PYTHON,			new PythonFoldParser());
 		map.put(SYNTAX_STYLE_RUST,				new CurlyFoldParser());

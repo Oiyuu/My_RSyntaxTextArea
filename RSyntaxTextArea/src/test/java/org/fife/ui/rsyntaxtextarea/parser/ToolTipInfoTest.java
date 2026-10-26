@@ -1,12 +1,11 @@
 /*
- * 10/03/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rsyntaxtextarea.parser;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import javax.swing.event.HyperlinkEvent;
@@ -31,7 +30,7 @@ class ToolTipInfoTest {
 	@BeforeEach
 	void setUp() throws MalformedURLException {
 		mhl = new MockHyperlinkListener();
-		imageBase = new URL("file:///localhost/images");
+		imageBase = URI.create("file:///localhost/images").toURL();
 	}
 
 

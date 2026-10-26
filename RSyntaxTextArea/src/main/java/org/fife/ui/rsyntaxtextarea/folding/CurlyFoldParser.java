@@ -1,8 +1,4 @@
 /*
- * 10/08/2011
- *
- * CurlyFoldParser.java - Fold parser for languages with C-style syntax.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -28,7 +24,7 @@ import org.fife.ui.rsyntaxtextarea.TokenTypes;
  * This parser knows nothing about language semantics; it uses
  * <code>RSyntaxTextArea</code>'s syntax highlighting tokens to identify
  * curly braces.  By default, it looks for single-char tokens of type
- * {@link Token#SEPARATOR}, with lexemes '<code>{</code>' or '<code>}</code>'.
+ * {@link TokenTypes#SEPARATOR}, with lexemes '<code>{</code>' or '<code>}</code>'.
  * If your {@link org.fife.ui.rsyntaxtextarea.TokenMaker} uses a different token
  * type for curly braces, you should override the {@link #isLeftCurly(Token)} and
  * {@link #isRightCurly(Token)} methods with your own definitions.  In theory,
@@ -178,7 +174,7 @@ public class CurlyFoldParser implements FoldParser {
 						}
 						else {
 							// If we're an MLC that ends on a later line...
-							if (t.getType()!=Token.COMMENT_EOL && !t.endsWith(C_MLC_END)) {
+							if (t.getType()!=TokenTypes.COMMENT_EOL && !t.endsWith(C_MLC_END)) {
 								//System.out.println("Starting MLC at: " + t.offset);
 								inMLC = true;
 								mlcStart = t.getOffset();
@@ -264,7 +260,7 @@ public class CurlyFoldParser implements FoldParser {
 					// Java-specific folding rules
 					else if (java) {
 
-						if (t.is(Token.RESERVED_WORD, KEYWORD_IMPORT)) {
+						if (t.is(TokenTypes.RESERVED_WORD, KEYWORD_IMPORT)) {
 							if (importStartLine==-1) {
 								importStartLine = line;
 								importGroupStartOffs = t.getOffset();

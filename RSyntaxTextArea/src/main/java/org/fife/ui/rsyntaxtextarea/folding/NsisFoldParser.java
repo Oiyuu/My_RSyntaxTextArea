@@ -1,8 +1,4 @@
 /*
- * 10/07/2012
- *
- * NsisFoldParser.java - Fold parser for NSIS.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -16,6 +12,7 @@ import javax.swing.text.BadLocationException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Token;
+import org.fife.ui.rsyntaxtextarea.TokenTypes;
 
 
 /**
@@ -40,7 +37,7 @@ public class NsisFoldParser implements FoldParser {
 
 	private static boolean foundEndKeyword(char[] keyword, Token t,
 			Stack<char[]> endWordStack) {
-		return t.is(Token.RESERVED_WORD, keyword) && !endWordStack.isEmpty() &&
+		return t.is(TokenTypes.RESERVED_WORD, keyword) && !endWordStack.isEmpty() &&
 			keyword==endWordStack.peek();
 	}
 
@@ -90,7 +87,7 @@ public class NsisFoldParser implements FoldParser {
 						}
 						else {
 							// If we're an MLC that ends on a later line...
-							if (t.getType()!=Token.COMMENT_EOL && !t.endsWith(C_MLC_END)) {
+							if (t.getType()!=TokenTypes.COMMENT_EOL && !t.endsWith(C_MLC_END)) {
 								//System.out.println("Starting MLC at: " + t.offset);
 								inMLC = true;
 								mlcStart = t.getOffset();
@@ -99,7 +96,7 @@ public class NsisFoldParser implements FoldParser {
 
 					}
 
-					else if (t.is(Token.RESERVED_WORD, KEYWORD_SECTION)) {
+					else if (t.is(TokenTypes.RESERVED_WORD, KEYWORD_SECTION)) {
 						if (currentFold==null) {
 							currentFold = new Fold(FoldType.CODE, textArea, t.getOffset());
 							folds.add(currentFold);
@@ -110,7 +107,7 @@ public class NsisFoldParser implements FoldParser {
 						endWordStack.push(KEYWORD_SECTION_END);
 					}
 
-					else if (t.is(Token.RESERVED_WORD, KEYWORD_FUNCTION)) {
+					else if (t.is(TokenTypes.RESERVED_WORD, KEYWORD_FUNCTION)) {
 						if (currentFold==null) {
 							currentFold = new Fold(FoldType.CODE, textArea, t.getOffset());
 							folds.add(currentFold);

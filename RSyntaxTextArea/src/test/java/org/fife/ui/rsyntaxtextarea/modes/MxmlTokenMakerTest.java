@@ -1,6 +1,4 @@
 /*
- * 03/23/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -820,5 +818,11 @@ class MxmlTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			token = token.getNextToken();
 			Assertions.assertTrue(token.is(TokenTypes.MARKUP_TAG_ATTRIBUTE_VALUE, '"' + attr + '"'));
 		}
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}()[]", createTokenMaker().getBracketPairs());
 	}
 }

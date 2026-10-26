@@ -1,8 +1,4 @@
 /*
- * 08/16/2014
- *
- * ClipboardHistoryPopup.java - Shows clipboard history in a popup window.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -42,6 +38,7 @@ import javax.swing.UIManager;
 import javax.swing.text.Caret;
 
 import org.fife.ui.rsyntaxtextarea.focusabletip.TipUtil;
+import org.fife.util.SwingUtils;
 
 
 /**
@@ -161,7 +158,7 @@ class ClipboardHistoryPopup extends JWindow {
 
 		Rectangle r;
 		try {
-			r = textArea.modelToView(textArea.getCaretPosition());
+			r = SwingUtils.getBounds(textArea, textArea.getCaretPosition());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;

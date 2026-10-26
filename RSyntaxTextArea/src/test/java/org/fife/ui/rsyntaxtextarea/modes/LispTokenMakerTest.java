@@ -1,6 +1,4 @@
 /*
- * 06/06/2016
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -272,6 +270,12 @@ class LispTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		assertAllTokensOfType(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE,
 			"\"\"", "\"hi\"", "\"\\u00fe\"", "\"\\\"\""
 	);
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("()", createTokenMaker().getBracketPairs());
 	}
 
 

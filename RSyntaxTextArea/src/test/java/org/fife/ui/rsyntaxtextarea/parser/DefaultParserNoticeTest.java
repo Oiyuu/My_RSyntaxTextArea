@@ -1,6 +1,4 @@
 /*
- * 03/16/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -186,10 +184,10 @@ class DefaultParserNoticeTest {
 	@Test
 	void testGetColor() {
 		notice = new DefaultParserNotice(parser, "Foo", 5);
-		notice.setColor(Color.yellow);
-		Assertions.assertEquals(Color.yellow, notice.getColor());
-		notice.setColor(Color.orange);
-		Assertions.assertEquals(Color.orange, notice.getColor());
+		notice.setColor(Color.YELLOW);
+		Assertions.assertEquals(Color.YELLOW, notice.getColor());
+		notice.setColor(Color.ORANGE);
+		Assertions.assertEquals(Color.ORANGE, notice.getColor());
 	}
 
 
@@ -295,10 +293,10 @@ class DefaultParserNoticeTest {
 	@Test
 	void testSetColor() {
 		notice = new DefaultParserNotice(parser, "Foo", 5);
-		notice.setColor(Color.yellow);
-		Assertions.assertEquals(Color.yellow, notice.getColor());
-		notice.setColor(Color.orange);
-		Assertions.assertEquals(Color.orange, notice.getColor());
+		notice.setColor(Color.YELLOW);
+		Assertions.assertEquals(Color.YELLOW, notice.getColor());
+		notice.setColor(Color.ORANGE);
+		Assertions.assertEquals(Color.ORANGE, notice.getColor());
 	}
 
 

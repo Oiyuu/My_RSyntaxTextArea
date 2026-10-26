@@ -1,8 +1,4 @@
 /*
- * 08/29/2004
- *
- * RSyntaxTextAreaEditorKit.java - The editor kit used by RSyntaxTextArea.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -37,6 +33,7 @@ import org.fife.ui.rtextarea.IconRowHeader;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextAreaEditorKit;
 import org.fife.ui.rtextarea.RecordableTextAction;
+import org.fife.ui.rtextarea.TextMode;
 
 
 /**
@@ -461,7 +458,7 @@ public class RSyntaxTextAreaEditorKit extends RTextAreaEditorKit {
 						Token t = doc.getTokenListForLine(
 							rsta.getCaretLineNumber());
 						t = RSyntaxUtilities.getTokenAtOffset(t, dot-1);
-						if (t!=null && t.getType()==Token.MARKUP_TAG_DELIMITER) { // Closing tag
+						if (t!=null && t.getType()==TokenTypes.MARKUP_TAG_DELIMITER) { // Closing tag
 							String tagName = discoverTagName(doc, dot);
 							if (tagName!=null) {
 								rsta.replaceSelection(tagName + (char)(ch+2));
@@ -502,16 +499,16 @@ public class RSyntaxTextAreaEditorKit extends RTextAreaEditorKit {
 				Token t = doc.getTokenListForLine(i);
 				while (t!=null && t.isPaintable()) {
 
-					if (t.getType()==Token.MARKUP_TAG_DELIMITER) {
+					if (t.getType()==TokenTypes.MARKUP_TAG_DELIMITER) {
 						if (t.isSingleChar('<') || t.isSingleChar('[')) {
 							t = t.getNextToken();
 							while (t!=null && t.isPaintable()) {
-								if (t.getType()==Token.MARKUP_TAG_NAME ||
+								if (t.getType()==TokenTypes.MARKUP_TAG_NAME ||
 									// Being lenient here and also checking
 									// for attributes, in case they
 									// (incorrectly) have whitespace between
 									// the '<' char and the element name.
-									t.getType()==Token.MARKUP_TAG_ATTRIBUTE) {
+									t.getType()==TokenTypes.MARKUP_TAG_ATTRIBUTE) {
 									stack.push(t.getLexeme());
 									break;
 								}
@@ -1529,7 +1526,7 @@ public class RSyntaxTextAreaEditorKit extends RTextAreaEditorKit {
 											 int languageIndex) {
 			int openCount = 0;
 			for (Token t : doc) {
-				if (t.getType()==Token.SEPARATOR && t.length()==1 &&
+				if (t.getType()==TokenTypes.SEPARATOR && t.length()==1 &&
 					t.getLanguageIndex()==languageIndex) {
 					char ch = t.charAt(0);
 					if (ch=='{') {
@@ -1778,7 +1775,7 @@ public class RSyntaxTextAreaEditorKit extends RTextAreaEditorKit {
 
 			if (!rsta.getInsertPairedCharacters() ||
 				textArea.getSelectionStart() != textArea.getSelectionEnd() ||
-				textArea.getTextMode() == RTextArea.OVERWRITE_MODE) {
+				textArea.getTextMode() == TextMode.OVERWRITE) {
 				super.actionPerformedImpl(e, textArea);
 				return;
 			}
@@ -1881,12 +1878,7 @@ public class RSyntaxTextAreaEditorKit extends RTextAreaEditorKit {
 				// soft tab behavior provided by RTextArea.replaceSelection().
 				String replacement = "\t";
 				if (textArea.getTabsEmulated()) {
-					StringBuilder sb = new StringBuilder();
-					int temp = textArea.getTabSize();
-					for (int i=0; i<temp; i++) {
-						sb.append(' ');
-					}
-					replacement = sb.toString();
+					replacement = " ".repeat(Math.max(0, textArea.getTabSize()));
 				}
 
 				textArea.beginAtomicEdit();

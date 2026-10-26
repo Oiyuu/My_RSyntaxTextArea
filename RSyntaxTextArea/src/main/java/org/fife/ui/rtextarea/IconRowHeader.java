@@ -1,35 +1,18 @@
 /*
- * 02/17/2009
- *
- * IconRowHeader.java - Renders icons in the gutter.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rtextarea;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.Position;
-import javax.swing.text.View;
 
 
 /**
@@ -359,6 +342,25 @@ public class IconRowHeader extends AbstractGutterComponent implements MouseListe
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		// Notify registered listeners about the click event
+		IconRowEvent evt = fireClickEvent(e);
+		boolean consumed = evt != null && evt.isConsumed();
+
+		// Toggle bookmarks only on a left-click, and only if no listener has consumed the event
+		if (!consumed && SwingUtilities.isLeftMouseButton(e)) {
+			if (e.getClickCount() == 1) {
+				if (bookmarkingEnabled && bookmarkIcon != null) {
+					try {
+						int line = viewToModelLine(e.getPoint());
+						if (line > -1) {
+							toggleBookmark(line);
+						}
+					} catch (BadLocationException ble) {
+						ble.printStackTrace(); // Should never happen
+					}
+				}
+			}
+		}
 	}
 
 
@@ -374,16 +376,6 @@ public class IconRowHeader extends AbstractGutterComponent implements MouseListe
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (bookmarkingEnabled && bookmarkIcon!=null) {
-			try {
-				int line = viewToModelLine(e.getPoint());
-				if (line>-1) {
-					toggleBookmark(line);
-				}
-			} catch (BadLocationException ble) {
-				ble.printStackTrace(); // Never happens
-			}
-		}
 	}
 
 
@@ -551,7 +543,7 @@ public class IconRowHeader extends AbstractGutterComponent implements MouseListe
 		Document doc = textArea.getDocument();
 		Element root = doc.getDefaultRootElement();
 		int lineCount = root.getElementCount();
-		int topPosition = textArea.viewToModel(
+		int topPosition = textArea.viewToModel2D(
 								new Point(visibleRect.x,visibleRect.y));
 		int topLine = root.getElementIndex(topPosition);
 
@@ -859,7 +851,7 @@ public class IconRowHeader extends AbstractGutterComponent implements MouseListe
 	 * @throws BadLocationException ble If an error occurs.
 	 */
 	private int viewToModelLine(Point p) throws BadLocationException {
-		int offs = textArea.viewToModel(p);
+		int offs = textArea.viewToModel2D(p);
 		return offs>-1 ? textArea.getLineOfOffset(offs) : -1;
 	}
 
@@ -920,7 +912,39 @@ public class IconRowHeader extends AbstractGutterComponent implements MouseListe
 		}
 	}
 
+	/**
+	 * Notifies all registered {@link IconRowListener} of a mouse click in the {@link IconRowHeader}.
+	 */
+	protected IconRowEvent fireClickEvent(MouseEvent mouseEvent) {
+		Object[] listeners = listenerList.getListenerList();
+		IconRowEvent evt = null;
 
+		for (int i = listeners.length - 2; i >= 0; i -= 2) {
+			if (listeners[i] == IconRowListener.class) {
+				// Create the event only once, when the first matching listener is found
+				if (evt == null) {
+					int line = -1;
+					try {
+						line = viewToModelLine(mouseEvent.getPoint());
+					} catch (BadLocationException ignored) {
+						// Should not happen; fallback line = -1
+					}
+
+					evt = new IconRowEvent(this, null, line);
+				}
+
+				// Notify the listener
+				((IconRowListener) listeners[i + 1]).mouseClicked(evt, mouseEvent);
+
+				// Stop dispatching if a listener consumed the event
+				if (evt.isConsumed()) {
+					break;
+				}
+			}
+		}
+
+		return evt;
+	}
 
 	/**
 	 * Adds a listener for the IconRowEvent posted after the Icon Row changes.

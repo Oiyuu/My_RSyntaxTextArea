@@ -1,18 +1,10 @@
 /*
- * 11/14/2003
- *
- * RPrintUtilities.java - A collection of static methods useful for printing
- * text from Swing text components.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.print;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 
@@ -46,7 +38,7 @@ public abstract class RPrintUtilities {
 	/**
 	 * The x-offset (for the page margin) when printing.
 	 */
-	private static int xOffset;
+	private static float xOffset;
 
 	/**
 	 * The length of a tab, in spaces.
@@ -102,8 +94,8 @@ public abstract class RPrintUtilities {
 	 * @return One of the constants from {@code Printable}.
 	 * @see #printDocumentMonospacedWordWrap
 	 */
-	public static int printDocumentMonospaced(Graphics g, Document doc, int fontSize, int pageIndex,
-							PageFormat pageFormat, int tabSize) {
+	public static int printDocumentMonospaced(Graphics2D g, Document doc, int fontSize, int pageIndex,
+	                                          PageFormat pageFormat, int tabSize) {
 
 		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize));
@@ -127,8 +119,8 @@ public abstract class RPrintUtilities {
 		// The (x,y) coordinate to print at (in pixels, not characters).
 		// Since y is the baseline of where we'll start printing (not the top-left
 		// corner), we offset it by the font's ascent ( + 1 just for good measure).
-		xOffset = (int)pageFormat.getImageableX();
-		int y = (int)pageFormat.getImageableY() + fm.getAscent() + 1;
+		xOffset = (float)pageFormat.getImageableX();
+		float y = (float)pageFormat.getImageableY() + fm.getAscent() + 1;
 
 		// A counter to keep track of the number of lines that WOULD HAVE been
 		// printed if we were printing all lines.
@@ -162,12 +154,8 @@ public abstract class RPrintUtilities {
 				int tabIndex = curLineString.indexOf('\t');
 				while (tabIndex > -1) {
 					int spacesNeeded = tabSizeInSpaces - (tabIndex % tabSizeInSpaces);
-                    StringBuilder stringBuilder = new StringBuilder();
-					for (int i=0; i<spacesNeeded; i++) {
-						stringBuilder.append(" ");
-					}
 					// Note that "\t" is actually a regex for this method.
-					curLineString = curLineString.replaceFirst("\t", stringBuilder.toString());
+					curLineString = curLineString.replaceFirst("\t", " ".repeat(Math.max(0, spacesNeeded)));
 					tabIndex = curLineString.indexOf('\t');
 				}
 			}
@@ -178,7 +166,7 @@ public abstract class RPrintUtilities {
 
 				numPrintedLines++;
 				if (numPrintedLines > startingLineNumber) {
-						g.drawString(curLineString.substring(0,maxCharsPerLine), xOffset,y);
+						g.drawString(curLineString.substring(0,maxCharsPerLine), xOffset, y);
 						y += fontHeight;
 						if (numPrintedLines==startingLineNumber+maxLinesPerPage) {
 							return Printable.PAGE_EXISTS;
@@ -193,7 +181,7 @@ public abstract class RPrintUtilities {
 
 			numPrintedLines++;
 			if (numPrintedLines>startingLineNumber) {
-				g.drawString(curLineString, xOffset,y);
+				g.drawString(curLineString, xOffset, y);
 				y += fontHeight;
 				if (numPrintedLines==startingLineNumber+maxLinesPerPage) {
 					return Printable.PAGE_EXISTS;
@@ -226,7 +214,7 @@ public abstract class RPrintUtilities {
 	 * @return One of the constants from {@code Printable}.
 	 * @see #printDocumentMonospaced
 	 */
-	public static int printDocumentMonospacedWordWrap(Graphics g, Document doc,
+	public static int printDocumentMonospacedWordWrap(Graphics2D g, Document doc,
 								int fontSize, int pageIndex,
 								PageFormat pageFormat, int tabSize) {
 
@@ -252,8 +240,8 @@ public abstract class RPrintUtilities {
 		// The (x,y) coordinate to print at (in pixels, not characters).
 		// Since y is the baseline of where we'll start printing (not the top-left
 		// corner), we offset it by the font's ascent ( + 1 just for good measure).
-		xOffset = (int)pageFormat.getImageableX();
-		int y = (int)pageFormat.getImageableY() + fm.getAscent() + 1;
+		xOffset = (float)pageFormat.getImageableX();
+		float y = (float)pageFormat.getImageableY() + fm.getAscent() + 1;
 
 		// A counter to keep track of the number of lines that WOULD HAVE been
 		// printed if we were printing all lines.
@@ -287,12 +275,8 @@ public abstract class RPrintUtilities {
 				int tabIndex = curLineString.indexOf('\t');
 				while (tabIndex > -1) {
 					int spacesNeeded = tabSizeInSpaces - (tabIndex % tabSizeInSpaces);
-                    StringBuilder stringBuilder = new StringBuilder();
-					for (int i=0; i<spacesNeeded; i++) {
-						stringBuilder.append(" ");
-					}
 					// Note that "\t" is actually a regex for this method.
-					curLineString = curLineString.replaceFirst("\t", stringBuilder.toString());
+					curLineString = curLineString.replaceFirst("\t", " ".repeat(Math.max(0, spacesNeeded)));
 					tabIndex = curLineString.indexOf('\t');
 				}
 			}
@@ -305,7 +289,7 @@ public abstract class RPrintUtilities {
 
 				numPrintedLines++;
 				if (numPrintedLines > startingLineNumber) {
-						g.drawString(curLineString.substring(0,breakPoint), xOffset,y);
+						g.drawString(curLineString.substring(0,breakPoint), xOffset, y);
 						y += fontHeight;
 						if (numPrintedLines==startingLineNumber+maxLinesPerPage) {
 							return Printable.PAGE_EXISTS;
@@ -320,7 +304,7 @@ public abstract class RPrintUtilities {
 
 			numPrintedLines++;
 			if (numPrintedLines>startingLineNumber) {
-				g.drawString(curLineString, xOffset,y);
+				g.drawString(curLineString, xOffset, y);
 				y += fontHeight;
 				if (numPrintedLines==startingLineNumber+maxLinesPerPage) {
 					return Printable.PAGE_EXISTS;
@@ -354,7 +338,7 @@ public abstract class RPrintUtilities {
 	 * @param tabSize The number of spaces to convert tabs to.
 	 * @return One of the constants from {@code Printable}.
 	 */
-	public static int printDocumentWordWrap(Graphics g, JTextComponent textComponent,
+	public static int printDocumentWordWrap(Graphics2D g, JTextComponent textComponent,
 										Font font, int pageIndex,
 										PageFormat pageFormat,
 										int tabSize) {
@@ -368,7 +352,7 @@ public abstract class RPrintUtilities {
 		fm = g.getFontMetrics();
 		int fontHeight = fm.getHeight();
 
-		final int lineLengthInPixels = (int)pageFormat.getImageableWidth();
+		final float lineLengthInPixels = (float)pageFormat.getImageableWidth();
 		final int maxLinesPerPage = (int)pageFormat.getImageableHeight() / fontHeight;
 
 		final int startingLineNumber = maxLinesPerPage * pageIndex;
@@ -379,8 +363,8 @@ public abstract class RPrintUtilities {
 		// The (x,y) coordinate to print at (in pixels, not characters).
 		// Since y is the baseline of where we'll start printing (not the top-left
 		// corner), we offset it by the font's ascent ( + 1 just for good measure).
-		xOffset = (int)pageFormat.getImageableX();
-		int y = (int)pageFormat.getImageableY() + fm.getAscent() + 1;
+		xOffset = (float)pageFormat.getImageableX();
+		float y = (float)pageFormat.getImageableY() + fm.getAscent() + 1;
 
 		// A counter to keep track of the number of lines that WOULD HAVE been
 		// printed if we were printing all lines.
@@ -416,7 +400,7 @@ public abstract class RPrintUtilities {
 			currentLineSeg = removeEndingWhitespace(currentLineSeg);
 
 			// Figure out how long the line is, in pixels.
-			int currentLineLengthInPixels = Utilities.getTabbedTextWidth(currentLineSeg, fm, 0, tabExpander, 0);
+			float currentLineLengthInPixels = Utilities.getTabbedTextWidth(currentLineSeg, fm, 0f, tabExpander, 0);
 
 			//System.err.println("'" + currentLineSeg + "' - " + currentLineLengthInPixels + "/" +
 			// LINE_LENGTH_IN_PIXELS);
@@ -470,7 +454,7 @@ public abstract class RPrintUtilities {
 								return Printable.NO_SUCH_PAGE;
 							}
 							currentLineLengthInPixels = Utilities.
-								getTabbedTextWidth(currentLineSeg, fm, 0, tabExpander, 0);
+								getTabbedTextWidth(currentLineSeg, fm, 0f, tabExpander, 0);
 						} while (currentLineLengthInPixels <= lineLengthInPixels);
 						currentPos--;
 
@@ -483,7 +467,7 @@ public abstract class RPrintUtilities {
 						return Printable.NO_SUCH_PAGE;
 					}
 
-					currentLineLengthInPixels = Utilities.getTabbedTextWidth(currentLineSeg, fm, 0, tabExpander, 0);
+					currentLineLengthInPixels = Utilities.getTabbedTextWidth(currentLineSeg, fm, 0f, tabExpander, 0);
 				} // End of while (currentLineLengthInPixels > LINE_LENGTH_IN_PIXELS).
 
 				startingOffset += currentPos;	// Where to start (offset from line's start), since this line wraps.
@@ -493,7 +477,7 @@ public abstract class RPrintUtilities {
 			numPrintedLines++;
 			if (numPrintedLines>startingLineNumber) {
 				//g.drawString(currentLineSeg.toString(), xOffset,y);
-				Utilities.drawTabbedText(currentLineSeg, xOffset,y, g, tabExpander, 0);
+				Utilities.drawTabbedText(currentLineSeg, xOffset, y, g, tabExpander, 0);
 				y += fontHeight;
 				if (numPrintedLines==startingLineNumber+maxLinesPerPage) {
 					return Printable.PAGE_EXISTS;
@@ -542,7 +526,7 @@ public abstract class RPrintUtilities {
 				return x;
 			}
 			int tabSizeInPixels = tabSizeInSpaces * fm.charWidth(' ');
-			int tabCount = (((int) x) - xOffset) / tabSizeInPixels;
+			int tabCount = ((int)(x - xOffset)) / tabSizeInPixels;
 			return xOffset + ((tabCount + 1f) * tabSizeInPixels);
 		}
 

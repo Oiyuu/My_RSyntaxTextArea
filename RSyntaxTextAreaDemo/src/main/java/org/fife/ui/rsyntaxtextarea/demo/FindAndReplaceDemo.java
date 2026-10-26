@@ -54,7 +54,7 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 		InputMap im = searchField.getInputMap();
 		ActionMap am = searchField.getActionMap();
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "searchForward");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK), "searchBackward");
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), "searchBackward");
 		am.put("searchForward", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -69,7 +69,7 @@ public final class FindAndReplaceDemo extends JFrame implements ActionListener {
 		});
 
 		// 让 Ctrl+F / Cmd+F 聚焦搜索框
-		int defaultMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		int defaultMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		im = textArea.getInputMap();
 		am = textArea.getActionMap();
 		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, defaultMod), "doSearch");

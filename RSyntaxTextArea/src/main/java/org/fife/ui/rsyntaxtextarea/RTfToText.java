@@ -1,8 +1,4 @@
 /*
- * 07/28/2008
- *
- * RtfToText.java - Returns the plain text version of RTF documents.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -231,11 +227,9 @@ final class RtfToText {
 	 * @throws IOException If an IO error occurs.
 	 */
 	private static String getPlainText(Reader r) throws IOException {
-		try {
+		try (r) {
 			RtfToText converter = new RtfToText(r);
 			return converter.convert();
-		} finally {
-			r.close();
 		}
 	}
 

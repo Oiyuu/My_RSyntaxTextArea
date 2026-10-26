@@ -1,16 +1,11 @@
 /*
- * 02/21/2004
- *
- * Token.java - A token used in syntax highlighting.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rsyntaxtextarea;
 
-import java.awt.Rectangle;
-
 import javax.swing.text.TabExpander;
+import java.awt.geom.Rectangle2D;
 
 
 /**
@@ -219,7 +214,7 @@ public interface Token extends TokenTypes {
 	 *        offset.
 	 * @return The position (in the document, NOT into the token list!) that
 	 *         covers the pixel location.  If <code>tokenList</code> is
-	 *         <code>null</code> or has type <code>Token.NULL</code>, then
+	 *         <code>null</code> or has type <code>TokenTypes.NULL</code>, then
 	 *         <code>-1</code> is returned; the caller should recognize this and
 	 *         return the actual end position of the (empty) line.
 	 */
@@ -440,7 +435,7 @@ public interface Token extends TokenTypes {
 	 * Returns whether this token is "paintable;" i.e., whether
 	 * the type of this token is one such that it has an associated syntax
 	 * style.  What this boils down to is whether the token type is greater
-	 * than <code>Token.NULL</code>.
+	 * than <code>TokenTypes.NULL</code>.
 	 *
 	 * @return Whether this token is paintable.
 	 */
@@ -504,8 +499,8 @@ public interface Token extends TokenTypes {
 	 *        object is reused to keep from frequent memory allocations.
 	 * @return The bounding box for the specified position in the model.
 	 */
-	Rectangle listOffsetToView(RSyntaxTextArea textArea, TabExpander e,
-			int pos, int x0, Rectangle rect);
+	Rectangle2D listOffsetToView(RSyntaxTextArea textArea, TabExpander e,
+			int pos, float x0, Rectangle2D rect);
 
 
 	/**

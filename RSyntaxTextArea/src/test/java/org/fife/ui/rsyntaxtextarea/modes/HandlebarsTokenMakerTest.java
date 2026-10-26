@@ -1,6 +1,4 @@
 /*
- * 03/23/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -2146,6 +2144,12 @@ class HandlebarsTokenMakerTest extends AbstractJFlexTokenMakerTest {
 			Assertions.assertEquals(TokenTypes.WHITESPACE, token.getType());
 		}
 
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("{}()[]", createTokenMaker().getBracketPairs());
 	}
 
 

@@ -1,6 +1,4 @@
 /*
- * 03/16/2015
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -622,6 +620,12 @@ class WindowsBatchTokenMakerTest extends AbstractJFlexTokenMakerTest {
 		assertTokenMapContains(tokens, "vol", reservedWord);
 		assertTokenMapContains(tokens, "xcopy", reservedWord);
 
+	}
+
+
+	@Test
+	void testGetBracketPairs() {
+		Assertions.assertEquals("()", createTokenMaker().getBracketPairs());
 	}
 
 }

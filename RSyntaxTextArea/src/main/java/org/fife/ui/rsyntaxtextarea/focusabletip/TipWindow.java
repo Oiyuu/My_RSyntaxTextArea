@@ -1,8 +1,4 @@
 /*
- * 07/29/2009
- *
- * TipWindow.java - The actual window component representing the tool tip.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -44,6 +40,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 
 import org.fife.ui.rsyntaxtextarea.HtmlUtil;
+import org.fife.util.SwingUtils;
 
 
 /**
@@ -173,7 +170,7 @@ class TipWindow extends JWindow {
 		try {
 
 			// modelToView call is required for this hack, never remove!
-			r = textArea.modelToView(textArea.getDocument().getLength()-1);
+			r = SwingUtils.getBounds(textArea, textArea.getDocument().getLength()-1);
 
 			// Ensure the text area doesn't start out too tall or wide.
 			d = textArea.getPreferredSize();
@@ -191,7 +188,7 @@ class TipWindow extends JWindow {
 
 			// if the new textArea width causes our text to wrap, we must
 			// compute a new preferred size to get all our physical lines.
-			r = textArea.modelToView(textArea.getDocument().getLength()-1);
+			r = SwingUtils.getBounds(textArea, textArea.getDocument().getLength()-1);
 			if (r.y+r.height>d.height) {
 				d.height = r.y + r.height + 5;
 				if (ft.getMaxSize() != null) {

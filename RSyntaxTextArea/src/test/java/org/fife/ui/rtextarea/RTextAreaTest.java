@@ -178,6 +178,20 @@ class RTextAreaTest {
 
 
 	@Test
+	void testGetUndoManager() {
+		final RUndoManager[] undoManager = new RUndoManager[1];
+		RTextArea textArea = new RTextArea() {
+			@Override
+			protected RUndoManager createUndoManager() {
+				RUndoManager um = new RUndoManager(this);
+				return undoManager[0] = um;
+			}
+		};
+		Assertions.assertEquals(undoManager[0], textArea.getUndoManager());
+	}
+
+
+	@Test
 	void testMarkAllOnOccurrenceSearches() {
 		RTextArea textArea = new RTextArea();
 		Assertions.assertTrue(textArea.getMarkAllOnOccurrenceSearches());
@@ -319,7 +333,7 @@ class RTextAreaTest {
 	void testReplaceSelection_tabsEmulatedWithWhiteSpace_overwriteMode() {
 		RTextArea textArea = new RTextArea("line 1\nline 2");
 		textArea.setTabsEmulated(true);
-		textArea.setTextMode(RTextArea.OVERWRITE_MODE);
+		textArea.setTextMode(TextMode.OVERWRITE);
 		textArea.setTabSize(4);
 		textArea.setCaretPosition(0);
 		textArea.replaceSelection("\t");
@@ -351,7 +365,7 @@ class RTextAreaTest {
 	@Test
 	void testSetCaretStyle_nullDoesntThrowException() {
 		RTextArea textArea = new RTextArea();
-		textArea.setCaretStyle(RTextArea.INSERT_MODE, null);
+		textArea.setCaretStyle(TextMode.INSERT, null);
 	}
 
 
@@ -373,11 +387,4 @@ class RTextAreaTest {
 	}
 
 
-	@Test
-	void setTextMode_invalidMode() {
-		RTextArea textArea = new RTextArea();
-		Assertions.assertEquals(RTextArea.INSERT_MODE, textArea.getTextMode());
-		textArea.setTextMode(-7);
-		Assertions.assertEquals(RTextArea.INSERT_MODE, textArea.getTextMode());
-	}
 }

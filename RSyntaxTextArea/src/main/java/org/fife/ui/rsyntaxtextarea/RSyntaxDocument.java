@@ -1,9 +1,4 @@
 /*
- * 10/16/2004
- *
- * RSyntaxDocument.java - A document capable of syntax highlighting, used by
- * RSyntaxTextArea.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -104,7 +99,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 	public RSyntaxDocument(TokenMakerFactory tmf, String syntaxStyle) {
 		putProperty(tabSizeAttribute, 5);
 		lastTokensOnLines = new DynamicIntArray(400);
-		lastTokensOnLines.add(Token.NULL); // Initial (empty) line.
+		lastTokensOnLines.add(TokenTypes.NULL); // Initial (empty) line.
 		s = new Segment();
 		setTokenMakerFactory(tmf);
 		setSyntaxStyle(syntaxStyle);
@@ -139,7 +134,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 		int line = lineMap.getElementIndex(e.getOffset());
 		int previousLine = line - 1;
 		int previousTokenType = (previousLine>-1 ?
-					lastTokensOnLines.get(previousLine) : Token.NULL);
+					lastTokensOnLines.get(previousLine) : TokenTypes.NULL);
 
 		// If entire lines were added...
 		if (added!=null && added.length>0) {
@@ -211,7 +206,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 			int line = change.getIndex();	// First line entirely removed.
 			int previousLine = line - 1;	// Line before that.
 			int previousTokenType = (previousLine>-1 ?
-					lastTokensOnLines.get(previousLine) : Token.NULL);
+					lastTokensOnLines.get(previousLine) : TokenTypes.NULL);
 
 			Element[] added = change.getChildrenAdded();
 			int numAdded = added==null ? 0 : added.length;
@@ -239,7 +234,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 
 			int previousLine = line - 1;
 			int previousTokenType = (previousLine>-1 ?
-					lastTokensOnLines.get(previousLine) : Token.NULL);
+					lastTokensOnLines.get(previousLine) : TokenTypes.NULL);
 			//System.err.println("previousTokenType for line : " + previousLine + " is " + previousTokenType);
 			// Update last tokens for lines below until they've stopped changing.
 			updateLastTokensBelow(line, numLines, previousTokenType);
@@ -277,6 +272,17 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 		// TODO: Remove terrible dependency on AbstractMarkupTokenMaker
 		return getLanguageIsMarkup() &&
 				((AbstractMarkupTokenMaker)tokenMaker).getCompleteCloseTags();
+	}
+
+
+	/**
+	 * Returns the bracket pairs used for bracket matching in this language.
+	 *
+	 * @return The bracket pairs string.
+	 * @see TokenMaker#getBracketPairs()
+	 */
+	public String getBracketPairs() {
+		return tokenMaker.getBracketPairs();
 	}
 
 
@@ -412,7 +418,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 			ble.printStackTrace();
 			return new TokenImpl();
 		}
-		int initialTokenType = line==0 ? Token.NULL :
+		int initialTokenType = line==0 ? TokenTypes.NULL :
 								getLastTokenTypeOnLine(line-1);
 
 		//return tokenMaker.getTokenList(s, initialTokenType, startOffset);
@@ -648,7 +654,7 @@ public class RSyntaxDocument extends RDocument implements Iterable<Token>,
 		// is the same.
 		Element map = getDefaultRootElement();
 		int numLines = map.getElementCount();
-		int lastTokenType = Token.NULL;
+		int lastTokenType = TokenTypes.NULL;
 		for (int i=0; i<numLines; i++) {
 			setSharedSegment(i);
 			lastTokenType = tokenMaker.getLastTokenTypeOnLine(s, lastTokenType);

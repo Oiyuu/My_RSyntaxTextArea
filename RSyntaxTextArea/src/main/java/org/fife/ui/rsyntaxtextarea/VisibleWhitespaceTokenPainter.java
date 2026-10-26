@@ -1,15 +1,13 @@
 /*
- * 03/16/2013
- *
- * VisibleWhitespaceTokenPainter - Renders tokens in an instance of
- * RSyntaxTextArea, with special glyphs to denote spaces and tabs.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rsyntaxtextarea;
 
+import org.fife.util.SwingUtils;
+
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import javax.swing.text.TabExpander;
@@ -54,7 +52,7 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 			RSyntaxTextArea host, TabExpander e, float clipStart,
 			boolean selected, boolean useSTC) {
 
-		int origX = (int)x;
+		float origX = x;
 		int textOffs = token.getTextOffset();
 		char[] text = token.getTextArray();
 		int end = textOffs + token.length();
@@ -64,8 +62,11 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 		Color fg = useSTC ? host.getSelectedTextColor() :
 			host.getForegroundForToken(token);
 		Color bg = selected ? null : host.getBackgroundForToken(token);
-		g.setFont(host.getFontForToken(token));
-		FontMetrics fm = host.getFontMetricsForToken(token);
+		Style style = host.getSyntaxScheme().getStyle(token.getType());
+		Font font = style.font != null ? style.font : host.getFont();
+		FontMetrics fm = style.fontMetrics != null ? style.fontMetrics :
+				host.getFontMetricsForTokenType(token.getType());
+		g.setFont(font);
 
 		int ascent = fm.getAscent();
 		int height = fm.getHeight();
@@ -77,7 +78,7 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 				case '\t':
 
 					// Fill in background.
-					nextX = x+fm.charsWidth(text, flushIndex,flushLen);
+					nextX = x + SwingUtils.charsWidth(fm, text, flushIndex,flushLen);
 					float nextTabStop = e.nextTabStop(nextX, 0);
 					if (bg!=null) {
 						paintBackground(x,y, nextTabStop-x,height, g,
@@ -87,7 +88,7 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 
 					// Paint chars cached before the tab.
 					if (flushLen > 0) {
-						g.drawChars(text, flushIndex, flushLen, (int)x,(int)y);
+						SwingUtils.drawChars(g, x, y, text, flushIndex, flushLen);
 						flushLen = 0;
 					}
 					flushIndex = i + 1;
@@ -101,15 +102,15 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 					// NOTE:  There is a little bit of a "fudge factor"
 					// here when "smooth text" is enabled, as "width"
 					// below may well not be the width given to the space
-					// by fm.charsWidth() (it depends on how it places the
+					// by charsWidth(fm, ) (it depends on how it places the
 					// space with respect to the preceding character).
 					// But, we assume the approximation is close enough for
 					// our drawing a dot for the space.
 
 					// "flushLen+1" ensures text is aligned correctly (or,
 					// aligned the same as in getWidth()).
-					nextX = x+fm.charsWidth(text, flushIndex,flushLen+1);
-					int width = fm.charWidth(' ');
+					nextX = x + SwingUtils.charsWidth(fm, text, flushIndex,flushLen+1);
+					float width = SwingUtils.charWidth(fm, ' ');
 
 					// Paint background.
 					if (bg!=null) {
@@ -120,7 +121,7 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 
 					// Paint chars before space.
 					if (flushLen>0) {
-						g.drawChars(text, flushIndex, flushLen, (int)x,(int)y);
+						SwingUtils.drawChars(g, x, y, text, flushIndex, flushLen);
 						flushLen = 0;
 					}
 
@@ -141,7 +142,7 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 			}
 		}
 
-		nextX = x+fm.charsWidth(text, flushIndex,flushLen);
+		nextX = x + SwingUtils.charsWidth(fm, text, flushIndex,flushLen);
 
 		if (flushLen>0 && nextX>=clipStart) {
 			if (bg!=null) {
@@ -149,20 +150,20 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 							ascent, host, bg);
 			}
 			g.setColor(fg);
-			g.drawChars(text, flushIndex, flushLen, (int)x,(int)y);
+			SwingUtils.drawChars(g, x, y, text, flushIndex, flushLen);
 		}
 
 		if (host.getUnderlineForToken(token)) {
 			g.setColor(fg);
-			int y2 = (int)(y+1);
-			g.drawLine(origX,y2, (int)nextX,y2);
+			float y2 = y+1;
+			SwingUtils.drawLine(g, origX,y2, nextX,y2);
 		}
 
 		// Don't check if it's whitespace - some TokenMakers may return types
-		// other than Token.WHITESPACE for spaces (such as Token.IDENTIFIER).
+		// other than TokenTypes.WHITESPACE for spaces (such as TokenTypes.IDENTIFIER).
 		// This also allows us to paint tab lines for MLC's.
 		if (host.getPaintTabLines() && origX==host.getMargin().left) {// && isWhitespace()) {
-			paintTabLines(token, origX, (int)y, (int)nextX, g, e, host);
+			paintTabLines(token, origX, y, nextX, g, e, host);
 		}
 
 		return nextX;
@@ -183,10 +184,10 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 	 * @param height The height of the current line of text being painted.
 	 */
 	protected void paintSpaceText(Graphics2D g, float x, float y, int ascent,
-								  int width, int height) {
-		int dotX = (int)(x - width/2f);
-		int dotY = (int)(y - ascent + height/2f);
-		g.drawLine(dotX, dotY, dotX, dotY);
+								  float width, int height) {
+		float dotX = x - width/2f; // "2.0f" for FindBugs
+		float dotY = y - ascent + height/2f; // Ditto
+		SwingUtils.drawLine(g, dotX, dotY, dotX, dotY);
 	}
 
 
@@ -203,12 +204,12 @@ public class VisibleWhitespaceTokenPainter extends DefaultTokenPainter {
 	 */
 	protected void paintTabText(Graphics2D g, float x, float y,
 						float nextTabStop, int ascent, int height) {
-		int x2 = (int)nextTabStop - 3;
-		if (x2 >= (int)x) {
-			int halfHeight = height / 2;
-			int ymid = (int) y - ascent + halfHeight;
-			g.drawLine((int) x, ymid, x2, ymid);
-		}
+		float halfHeight = height / 2f;
+		float quarterHeight = halfHeight / 2;
+		float ymid = (int)y - ascent + halfHeight;
+		SwingUtils.drawLine(g, x,ymid, nextTabStop,ymid);
+		SwingUtils.drawLine(g, nextTabStop,ymid, nextTabStop-4,ymid-quarterHeight);
+		SwingUtils.drawLine(g, nextTabStop,ymid, nextTabStop-4,ymid+quarterHeight);
 	}
 
 }

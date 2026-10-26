@@ -1,14 +1,11 @@
 /*
- * 02/09/2025
- *
- * IconRowListener.java - Interface for an object that listens for changes in IconRowHeader.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 
 package org.fife.ui.rtextarea;
 
+import java.awt.event.MouseEvent;
 import java.util.EventListener;
 
 
@@ -36,5 +33,14 @@ public interface IconRowListener extends EventListener {
 	 * @see IconRowHeader#toggleBookmark(int)
 	 */
 	void bookmarkRemoved(IconRowEvent e);
+
+	/**
+	 * Invoked when the user clicks on a line in the icon row.
+	 *
+	 * @param e an IconRowEvent describing the changes to the IconRowHeader
+	 * @param me the event describing the click
+	 */
+	default void mouseClicked(IconRowEvent e, MouseEvent me) {
+	}
 
 }

@@ -91,10 +91,10 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
 
       // 这里那里改几处样式
       SyntaxScheme scheme = textArea.getSyntaxScheme();
-      scheme.getStyle(Token.RESERVED_WORD).background = Color.pink;
-      scheme.getStyle(Token.DATA_TYPE).foreground = Color.blue;
-      scheme.getStyle(Token.LITERAL_STRING_DOUBLE_QUOTE).underline = true;
-      scheme.getStyle(Token.COMMENT_EOL).font = new Font("Georgia",
+      scheme.getStyle(TokenTypes.RESERVED_WORD).background = Color.PINK;
+      scheme.getStyle(TokenTypes.DATA_TYPE).foreground = Color.BLUE;
+      scheme.getStyle(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE).underline = true;
+      scheme.getStyle(TokenTypes.COMMENT_EOL).font = new Font("Georgia",
             Font.ITALIC, 18);
 
       textArea.revalidate();

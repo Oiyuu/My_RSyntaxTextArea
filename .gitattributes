@@ -1,0 +1,6 @@
+# 统一行尾为 LF：4.0.x 起 checkstyle 启用了 LineEnding 检查，
+# 且 .editorconfig 中 end_of_line = lf，在 Windows 上若不统一会导致全量检查失败。
+* text=auto eol=lf
+
+# Windows 批处理必须用 CRLF，否则 cmd.exe 执行可能异常
+*.bat text eol=crlf

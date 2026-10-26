@@ -1,9 +1,4 @@
 /*
- * 02/26/2004
- *
- * SyntaxScheme.java - The set of colors and tokens used by an RSyntaxTextArea
- * to color tokens.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -19,12 +14,13 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 
 /**
@@ -448,7 +444,7 @@ public class SyntaxScheme implements Cloneable, TokenTypes {
 		styles[COMMENT_MULTILINE]			= new Style(comment, null, commentFont);
 		styles[COMMENT_DOCUMENTATION]		= new Style(docComment, null, commentFont);
 		styles[COMMENT_KEYWORD]			= new Style(new Color(255,152,0), null, commentFont);
-		styles[COMMENT_MARKUP]			= new Style(Color.gray, null, commentFont);
+		styles[COMMENT_MARKUP]			= new Style(Color.GRAY, null, commentFont);
 		styles[RESERVED_WORD]				= new Style(keyword, null, keywordFont);
 		styles[RESERVED_WORD_2]			= new Style(keyword, null, keywordFont);
 		styles[FUNCTION]					= new Style(function);
@@ -462,9 +458,9 @@ public class SyntaxScheme implements Cloneable, TokenTypes {
 		styles[DATA_TYPE]				= new Style(dataType, null, keywordFont);
 		styles[VARIABLE]					= new Style(variable);
 		styles[REGEX]						= new Style(regex);
-		styles[ANNOTATION]				= new Style(Color.gray);
+		styles[ANNOTATION]				= new Style(Color.GRAY);
 		styles[IDENTIFIER]				= new Style(null);
-		styles[WHITESPACE]				= new Style(Color.gray);
+		styles[WHITESPACE]				= new Style(Color.GRAY);
 		styles[SEPARATOR]				= new Style(Color.RED);
 		styles[OPERATOR]					= new Style(operator);
 		styles[PREPROCESSOR]				= new Style(preprocessor);
@@ -626,14 +622,15 @@ public class SyntaxScheme implements Cloneable, TokenTypes {
 				throws IOException {
 			SyntaxSchemeLoader parser;
 			try {
-				XMLReader reader = XMLReaderFactory.createXMLReader();
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+				XMLReader reader = factory.newSAXParser().getXMLReader();
 				parser = new SyntaxSchemeLoader(baseFont);
 				parser.baseFont = baseFont;
 				reader.setContentHandler(parser);
 				InputSource is = new InputSource(in);
 				is.setEncoding("UTF-8");
 				reader.parse(is);
-			} catch (SAXException se) {
+			} catch (SAXException | ParserConfigurationException se) {
 				throw new IOException(se.toString());
 			}
 			return parser.scheme;

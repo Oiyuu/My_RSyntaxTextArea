@@ -1,8 +1,4 @@
 /*
- * 09/24/2004
- *
- * UnicodeWriter.java - Writes Unicode output with the proper BOM.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -259,6 +255,18 @@ public class UnicodeWriter extends Writer {
 
 
 	/**
+	 * Writes a single character.
+	 *
+	 * @param c An integer specifying the character to write.
+	 * @throws IOException If an IO error occurs.
+	 */
+	@Override
+	public void write(int c) throws IOException {
+		internalOut.write(c);
+	}
+
+
+	/**
 	 * Writes a portion of an array of characters.
 	 *
 	 * @param cbuf The buffer of characters.
@@ -269,18 +277,6 @@ public class UnicodeWriter extends Writer {
 	@Override
 	public void write(char[] cbuf, int off, int len) throws IOException {
 		internalOut.write(cbuf, off, len);
-	}
-
-
-	/**
-	 * Writes a single character.
-	 *
-	 * @param c An integer specifying the character to write.
-	 * @throws IOException If an IO error occurs.
-	 */
-	@Override
-	public void write(int c) throws IOException {
-		internalOut.write(c);
 	}
 
 

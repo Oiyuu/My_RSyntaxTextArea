@@ -1,8 +1,4 @@
 /*
- * 12/14/08
- *
- * AbstractTokenMakerFactory.java - Base class for TokenMaker implementations.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
@@ -122,7 +118,7 @@ public abstract class AbstractTokenMakerFactory extends TokenMakerFactory {
 		}
 
 		public TokenMaker create() throws Exception {
-			return (TokenMaker)Class.forName(className, true, cl).newInstance();
+			return (TokenMaker)Class.forName(className, true, cl).getDeclaredConstructor().newInstance();
 		}
 
 	}

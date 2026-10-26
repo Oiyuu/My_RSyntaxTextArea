@@ -1,12 +1,10 @@
 /*
- * 04/07/2005
- *
- * RTextAreaBase.java - The base class for an RTextArea.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rtextarea;
+
+import org.fife.util.SwingUtils;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
@@ -224,12 +222,9 @@ public abstract class RTextAreaBase extends JTextArea {
 
 		int caretPosition = getCaretPosition();
 		int tabSize = getTabSize();
-		StringBuilder stringBuilder = new StringBuilder();
-		for (int i=0; i<tabSize; i++) {
-			stringBuilder.append(" ");
-		}
+		String stringBuilder = " ".repeat(Math.max(0, tabSize));
 		String text = getText();
-		setText(text.replaceAll(stringBuilder.toString(), "\t"));
+		setText(text.replaceAll(stringBuilder, "\t"));
 		int newDocumentLength = getDocument().getLength();
 
 		// Place the caret back in its proper position.
@@ -259,12 +254,9 @@ public abstract class RTextAreaBase extends JTextArea {
 
 		int caretPosition = getCaretPosition();
 		int tabSize = getTabSize();
-		StringBuilder tabInSpaces = new StringBuilder();
-		for (int i=0; i<tabSize; i++) {
-			tabInSpaces.append(' ');
-		}
+		String tabInSpaces = " ".repeat(Math.max(0, tabSize));
 		String text = getText();
-		setText(text.replaceAll("\t", tabInSpaces.toString()));
+		setText(text.replaceAll("\t", tabInSpaces));
 
 		// Put caret back at same place in document.
 		setCaretPosition(caretPosition);
@@ -716,7 +708,7 @@ public abstract class RTextAreaBase extends JTextArea {
 		// line can span multiple physical lines.
 		if (getLineWrap()) {
 			try {
-				Rectangle temp = modelToView(dot);
+				Rectangle temp = SwingUtils.getBounds(this, dot);
 				if (temp!=null) {
 					currentCaretY = temp.y;
 				}
@@ -738,7 +730,7 @@ public abstract class RTextAreaBase extends JTextArea {
 //			}
 // Modified for code folding requirements
 try {
-	Rectangle temp = modelToView(dot);
+	Rectangle temp = SwingUtils.getBounds(this, dot);
 	if (temp!=null) {
 		currentCaretY = temp.y;
 	}

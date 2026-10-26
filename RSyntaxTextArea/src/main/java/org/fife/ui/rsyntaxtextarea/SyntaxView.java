@@ -1,20 +1,17 @@
 /*
- * 02/24/2004
- *
- * SyntaxView.java - The View object used by RSyntaxTextArea when word wrap is
- * disabled.
- *
  * This library is distributed under a modified BSD license.  See the included
  * LICENSE file for details.
  */
 package org.fife.ui.rsyntaxtextarea;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
 import org.fife.ui.rsyntaxtextarea.folding.Fold;
 import org.fife.ui.rsyntaxtextarea.folding.FoldManager;
+import org.fife.util.SwingUtils;
 
 
 /**
@@ -55,8 +52,8 @@ public class SyntaxView extends View implements TabExpander,
 	private Element longLine;
 	private float longLineWidth;
 
-	private int tabSize;
-	private int tabBase;
+	private float tabSize;
+	private float tabBase;
 
 	/**
 	 * Cached for each paint() call so each drawLine() call has access to it.
@@ -68,8 +65,8 @@ public class SyntaxView extends View implements TabExpander,
 	 */
 	private int lineHeight;
 	private int ascent;
-	private int clipStart;
-	private int clipEnd;
+	private float clipStart;
+	private float clipEnd;
 
 	/**
 	 * Temporary token used when we need to "modify" tokens for rendering
@@ -77,11 +74,6 @@ public class SyntaxView extends View implements TabExpander,
 	 * immutable, we use this temporary token to do that work.
 	 */
 	private TokenImpl tempToken;
-
-	/**
-	 * Used as the default rendered EOL marker.
-	 */
-	static final String EOL_MARKER = "\u00B6";
 
 
 	/**
@@ -107,7 +99,7 @@ public class SyntaxView extends View implements TabExpander,
 		Component c = getContainer();
 		font = c.getFont();
 		metrics = c.getFontMetrics(font);
-		tabSize = getTabSize() * metrics.charWidth(' ');
+		tabSize = (float) getTabSize() * SwingUtils.charWidth(metrics, ' ');
 		Element lines = getElement();
 		int n = lines.getElementCount();
 		for (int i=0; i<n; i++) {
@@ -149,11 +141,12 @@ public class SyntaxView extends View implements TabExpander,
 	protected void damageLineRange(int line0, int line1, Shape a,
 												Component host) {
 		if (a != null) {
-			Rectangle area0 = lineToRect(a, line0);
-			Rectangle area1 = lineToRect(a, line1);
+			Rectangle2D area0 = lineToRect(a, line0);
+			Rectangle2D area1 = lineToRect(a, line1);
 			if ((area0 != null) && (area1 != null)) {
-				Rectangle dmg = area0.union(area1); // damage.
-				host.repaint(dmg.x, dmg.y, dmg.width, dmg.height);
+				Rectangle2D dmg = new Rectangle2D.Float();
+				Rectangle2D.union(area0, area1, dmg); // damage.
+				host.repaint((int) dmg.getX(), (int) dmg.getY(), (int) dmg.getWidth(), (int) dmg.getHeight());
 			}
 			else {
 				host.repaint();
@@ -171,9 +164,9 @@ public class SyntaxView extends View implements TabExpander,
 	 * @param y The y-coordinate at which to render.
 	 */
 	static void drawEOLMarker(RSyntaxTextArea textArea, Graphics2D g, float x, float y) {
-		g.setColor(textArea.getForegroundForTokenType(Token.WHITESPACE));
-		g.setFont(textArea.getFontForTokenType(Token.WHITESPACE));
-		g.drawString(EOL_MARKER, x, y);
+		g.setColor(textArea.getForegroundForTokenType(TokenTypes.WHITESPACE));
+		g.setFont(textArea.getFontForTokenType(TokenTypes.WHITESPACE));
+		g.drawString(textArea.getEOLMarker(), x, y);
 	}
 
 
@@ -339,7 +332,7 @@ public class SyntaxView extends View implements TabExpander,
 	 * @return The width of the EOL marker.
 	 */
 	private float getEOLMarkerWidth(RSyntaxTextArea textArea) {
-		return metrics.stringWidth(EOL_MARKER);
+		return metrics.stringWidth(textArea.getEOLMarker());
 	}
 
 
@@ -543,11 +536,11 @@ public class SyntaxView extends View implements TabExpander,
 	 * @param line The line number to find the region of.  This must
 	 *        be a valid line number in the model.
 	 */
-	protected Rectangle lineToRect(Shape a, int line) {
-		Rectangle r = null;
+	protected Rectangle2D lineToRect(Shape a, int line) {
+		Rectangle2D r = null;
 		updateMetrics();
 		if (metrics != null) {
-			Rectangle alloc = a.getBounds();
+			Rectangle2D alloc = a.getBounds2D();
 			// NOTE:  lineHeight is not initially set here, leading to the
 			// current line not being highlighted when a document is first
 			// opened.  So, we set it here just in case.
@@ -557,16 +550,15 @@ public class SyntaxView extends View implements TabExpander,
 				int hiddenCount = fm.getHiddenLineCountAbove(line);
 				line -= hiddenCount;
 			}
-			r = new Rectangle(alloc.x, alloc.y + line*lineHeight,
-									alloc.width, lineHeight);
+			r = new Rectangle2D.Float((float) alloc.getX(), (float) (alloc.getY() + line*lineHeight),
+				(float) alloc.getWidth(), lineHeight);
 		}
 		return r;
 	}
 
 
 	/**
-	 * Provides a mapping from the document model coordinate space
-	 * to the coordinate space of the view mapped to it.
+	 * Returns the bounding box for an offset in the document.
 	 *
 	 * @param pos the position to convert &gt;= 0
 	 * @param a the allocated region to render into
@@ -584,19 +576,12 @@ public class SyntaxView extends View implements TabExpander,
 		RSyntaxDocument doc = (RSyntaxDocument)getDocument();
 		int lineIndex = map.getElementIndex(pos);
 		Token tokenList = doc.getTokenListForLine(lineIndex);
-		Rectangle lineArea = lineToRect(a, lineIndex);
-		tabBase = lineArea.x; // Used by listOffsetToView().
+		Rectangle2D lineArea = lineToRect(a, lineIndex);
+		tabBase = (float) lineArea.getX();
 
-		//int x = (int)RSyntaxUtilities.getTokenListWidthUpTo(tokenList,
-		//							(RSyntaxTextArea)getContainer(),
-		//							this, 0, pos);
-		// We use this method instead as it returns the actual bounding box,
-		// not just the x-coordinate.
-		lineArea = tokenList.listOffsetToView(
+		return tokenList.listOffsetToView(
 						(RSyntaxTextArea)getContainer(), this, pos,
 						tabBase, lineArea);
-
-		return lineArea;
 
 	}
 
@@ -699,11 +684,12 @@ public class SyntaxView extends View implements TabExpander,
 	 */
 	@Override
 	public float nextTabStop(float x, int tabOffset) {
-		if (tabSize == 0) {
+		if (tabSize < 1f) {
 			return x;
 		}
-		int tabCount = (((int)x) - tabBase) / tabSize;
-		return tabBase + ((tabCount + 1f) * tabSize);
+		int tabCount = (int) ((x - tabBase) / tabSize);
+		float offset = 1f;   // prevent next tab from occurring on the same pixel as the preceding character ends
+		return offset + tabBase + ((tabCount + 1f) * tabSize);
 	}
 
 
@@ -716,6 +702,7 @@ public class SyntaxView extends View implements TabExpander,
 	 */
 	@Override
 	public void paint(Graphics g, Shape a) {
+		Graphics2D g2d = (Graphics2D) g;
 
 		RSyntaxDocument document = (RSyntaxDocument)getDocument();
 
@@ -724,23 +711,22 @@ public class SyntaxView extends View implements TabExpander,
 		tabBase = alloc.x;
 		host = (RSyntaxTextArea)getContainer();
 
-		Rectangle clip = g.getClipBounds();
+		Rectangle2D clip = g.getClip().getBounds2D();
 		// An attempt to speed things up for files with long lines.  Note that
 		// this will actually slow things down a bit for the common case of
 		// regular-length lines, but it doesn't make a perceivable difference.
-		clipStart = clip.x;
-		clipEnd = clipStart + clip.width;
-
+		clipStart = (float) clip.getX();
+		clipEnd = (float) (clipStart + clip.getWidth());
 		lineHeight = host.getLineHeight();
 		ascent = host.getMaxAscent();//metrics.getAscent();
-		int heightAbove = clip.y - alloc.y;
-		int linesAbove = Math.max(0, heightAbove / lineHeight);
+		double heightAbove = clip.getY() - alloc.y;
+		int linesAbove = (int) Math.max(0, heightAbove / lineHeight);
 
 		FoldManager fm = host.getFoldManager();
 		linesAbove += fm.getHiddenLineCountAbove(linesAbove, true);
-		Rectangle lineArea = lineToRect(a, linesAbove);
-		int y = lineArea.y + ascent;
-		int x = lineArea.x;
+		Rectangle2D lineArea = lineToRect(a, linesAbove);
+		int y = (int) (lineArea.getY() + ascent);
+		int x = (int) lineArea.getX();
 		Element map = getElement();
 		int lineCount = map.getElementCount();
 
@@ -751,14 +737,14 @@ public class SyntaxView extends View implements TabExpander,
 		RSyntaxTextAreaHighlighter h =
 					(RSyntaxTextAreaHighlighter)host.getHighlighter();
 
-		Graphics2D g2d = (Graphics2D)g;
 		Token token;
 		//System.err.println("Painting lines: " + linesAbove + " to " + (endLine-1));
 
 		TokenPainter painter = host.getTokenPainter();
 		int line = linesAbove;
+		int clipBottom = (int)(clip.getY() + clip.getHeight()) + ascent;
 		//int count = 0;
-		while (y<clip.y+clip.height+ascent && line<lineCount) {
+		while (y < clipBottom && line < lineCount) {
 
 			Fold fold = fm.getFoldForLine(line);
 			boolean isFoldCollapsed = fold != null && fold.isCollapsed();
@@ -800,8 +786,8 @@ public class SyntaxView extends View implements TabExpander,
 				// Visible indicator of collapsed lines
 				Color c = RSyntaxUtilities.getFoldedLineBottomColor(host);
 				if (c!=null) {
-					g.setColor(c);
-					g.drawLine(x,y+lineHeight-ascent-1,
+					g2d.setColor(c);
+					g2d.drawLine(x,y+lineHeight-ascent-1,
 							host.getWidth(),y+lineHeight-ascent-1);
 				}
 
@@ -1007,7 +993,7 @@ public class SyntaxView extends View implements TabExpander,
 
 			Element map = doc.getDefaultRootElement();
 			lineHeight = host.getLineHeight();
-			int lineIndex = Math.abs((y - alloc.y) / lineHeight);//metrics.getHeight() );
+			int lineIndex = (y - alloc.y) / lineHeight;//metrics.getHeight() );
 			FoldManager fm = host.getFoldManager();
 			//System.out.print("--- " + lineIndex);
 			lineIndex += fm.getHiddenLineCountAbove(lineIndex, true);

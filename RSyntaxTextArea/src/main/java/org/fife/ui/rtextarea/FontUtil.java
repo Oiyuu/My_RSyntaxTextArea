@@ -4,8 +4,9 @@
  */
 package org.fife.ui.rtextarea;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
+import org.fife.ui.rsyntaxtextarea.OS;
 
+import javax.swing.*;
 import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.font.TextAttribute;
@@ -14,12 +15,22 @@ import java.util.Map;
 
 
 /**
- * Utility methods related to fonts.
+ * Utility methods related to fonts. Using these methods is preferred over the {@code new Font()} constructor as they
+ * ensure fallback fonts are properly configured for glyphs unsupported by the primary font.
  *
  * @author Robert Futrell
  * @version 1.0
  */
 public final class FontUtil {
+
+	/**
+	 * If a KV pair with this key is defined in the UI defaults as a Font,
+	 * that font will be returned by {@link #getDefaultMonospacedFont()}. Note
+	 * that if you use this method, you should consider using {@link #createFont(String, int, int)}
+	 * to ensure it has a fallback for glyphs it doesn't support.
+	 */
+	public static final String DEFAULT_FONT_KEY = "org.fife.ui.rtextarea.defaultFont";
+
 
 	/**
 	 * Private constructor to prevent instantiation.
@@ -95,15 +106,20 @@ public final class FontUtil {
 	 */
 	public static Font getDefaultMonospacedFont() {
 
-		int os = RSyntaxUtilities.getOS();
+		Font font = UIManager.getFont(DEFAULT_FONT_KEY);
+		if (font != null) {
+			return font;
+		}
 
-		if (os == RSyntaxUtilities.OS_MAC_OSX) {
+		OS os = OS.get();
+
+		if (os == OS.MAC_OS_X) {
 			return getDefaultMonospaceFontMacOS();
 		}
-		else if (os == RSyntaxUtilities.OS_WINDOWS) {
+		else if (os == OS.WINDOWS) {
 			return getDefaultMonospaceFontWindows();
 		}
-		else if (os == RSyntaxUtilities.OS_LINUX) {
+		else if (os == OS.LINUX) {
 			return getDefaultMonospaceFontLinux();
 		}
 
