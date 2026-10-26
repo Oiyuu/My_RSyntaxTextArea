@@ -11,6 +11,10 @@ description = '基于 RSyntaxTextArea 的 AI 编辑器应用'
 
 dependencies {
     implementation project(':RSyntaxTextArea')
+
+    // 仅用于解析 LLM 返回的 JSON。Apache-2.0，体积约 280KB，无传递依赖。
+    // HTTP 通信使用 JDK 内置的 java.net.http.HttpClient，无需额外依赖。
+    implementation 'com.google.code.gson:gson:2.11.0'
 }
 
 application {
