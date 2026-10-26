@@ -1,0 +1,18 @@
+plugins {
+    id 'application'
+    id 'base'
+}
+
+base {
+    archivesName = 'ai-editor'
+}
+
+description = '基于 RSyntaxTextArea 的 AI 编辑器应用'
+
+dependencies {
+    implementation project(':RSyntaxTextArea')
+}
+
+application {
+    mainClass.set('org.fife.ui.aieditor.App')
+}

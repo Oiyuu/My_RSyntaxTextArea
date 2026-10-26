@@ -6,4 +6,4 @@ pluginManagement {
 
 rootProject.name = 'RSyntaxTextArea'
 
-include 'RSyntaxTextArea', 'RSyntaxTextAreaDemo'
+include 'RSyntaxTextArea', 'RSyntaxTextAreaDemo', 'ai-editor'
